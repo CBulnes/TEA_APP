@@ -23,6 +23,10 @@ namespace Tea.BL
         {
             return usuarioDA.actualizar_contraseña(usuario);
         }
+        public List<Usuario> listar_doctores()
+        {
+            return usuarioDA.listar_doctores();
+        }
 
     }
 }

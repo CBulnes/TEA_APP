@@ -31,31 +31,7 @@ $('#btn_ing').on('click', function () {
     var pass = $('#txtPassword').val().trim();
     var check = true;
 
-    //for (var i = 0; i < input.length; i++) {
-    //    if (validate(input[i]) == false) {
-    //        showValidate(input[i]);
-    //        check = false;
-    //    }
-    //}
-
     if (check) {
-        //var response = grecaptcha.getResponse();
-        //if (response.length == 0) {
-        //    //show_toast('warning', 'Debe resolver el captcha');
-        //    alert('Debe resolver el captcha');
-        //    return;
-        //}
-
-        if ($('#b').val().trim() == '') {
-            alerta('Debes resolver el captcha', 'warning');
-            return;
-        }
-        if (eval($('#a').val()) == $('#b').val()) {
-            alerta('Captcha correcto', 'success');
-        } else {
-            alerta('El captcha es incorrecto', 'warning');
-            return;
-        }
 
         setTimeout(function () {
             $.ajax({

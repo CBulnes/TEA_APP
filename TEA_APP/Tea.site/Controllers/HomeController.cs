@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using System.IO;
 using Tea.entities;
 using Tea.utilities;
+using Microsoft.AspNetCore.Hosting;
+using System.Drawing;
 
 namespace Tea.site.Controllers
 {
@@ -30,8 +32,14 @@ namespace Tea.site.Controllers
         RespuestaPuntoVisitado oRespuestaPV = new RespuestaPuntoVisitado();
         RespuestaArchivos oRespuestaA = new RespuestaArchivos();
         Menu oMenu = new Menu();
-
         dynamic obj = new System.Dynamic.ExpandoObject();
+
+        private IHostingEnvironment Environment;
+
+        public HomeController(IHostingEnvironment _environment)
+        {
+            Environment = _environment;
+        }
 
         public IActionResult Index()
         {
@@ -53,7 +61,7 @@ namespace Tea.site.Controllers
                 obj.call_center_invitado = Helper.GetCallCenterInvitado();
 
                 string vista = "";
-                if (obj.id_tipousuario == 1) //admin
+                if (obj.id_tipousuario == 1 || obj.id_tipousuario == 3) //admin o doctor
                 {
                     vista = "IndexAdmin";
                 }
@@ -180,25 +188,44 @@ namespace Tea.site.Controllers
             return Content(res);
         }
 
-        [HttpPost]
-        public ActionResult<RespuestaMenu> validar_menu()
+        [HttpGet]
+        public ActionResult<List<Menu>> listar_menu()
         {
-            string res = "";
+            List<Menu> menu = new List<Menu>();
             try
             {
-                string id_usuario = Convert.ToInt32(HttpContext.Session.GetInt32("id_usuario")).ToString();
-                string id_tipousuario = Convert.ToInt32(HttpContext.Session.GetInt32("id_tipousuario")).ToString();
+                //string id_usuario = Convert.ToInt32(HttpContext.Session.GetInt32("id_usuario")).ToString();
+                //string id_tipousuario = Convert.ToInt32(HttpContext.Session.GetInt32("id_tipousuario")).ToString();
 
-                url = url_menu + "/" + id_usuario + "/" + id_tipousuario;
-                res = ApiCaller.consume_endpoint_method(url, null, "GET");
-                oRespuesta = JsonConvert.DeserializeObject<RespuestaMenu>(res);
+                //url = url_menu + "/" + id_usuario + "/" + id_tipousuario;
+                //res = ApiCaller.consume_endpoint_method(url, null, "GET");
+                //oRespuesta = JsonConvert.DeserializeObject<RespuestaMenu>(res);
+
+                string tipo_usuario = HttpContext.Session.GetString("tipousuario");
+
+                menu.Add(new Menu { nombre_opcion = "Inicio", ruta_opcion = "Home" });
+
+                if (tipo_usuario == "ADMIN" || tipo_usuario == "ADMINISTRADOR")
+                {
+                    //menu.Add(new Menu { nombre_opcion = "Mantenimiento", ruta_opcion = "Mantenimiento" });
+                }
+                else if (tipo_usuario == "CLIENTE")
+                {
+                    menu.Add(new Menu { nombre_opcion = "Registro de citas", ruta_opcion = "RegistroCitas" });
+                    menu.Add(new Menu { nombre_opcion = "Historial de citas", ruta_opcion = "HistorialCitas" });
+                }
+                else if (tipo_usuario == "DOCTOR" || tipo_usuario == "ESPECIALISTA")
+                {
+                    menu.Add(new Menu { nombre_opcion = "Historial de citas", ruta_opcion = "HistorialCitas" });
+                }
             }
             catch (Exception ex)
             {
-                oRespuesta.estado = "ERROR";
-                oRespuesta.descripcion = ex.Message.ToString();
+                //oRespuesta.estado = "ERROR";
+                //oRespuesta.descripcion = ex.Message.ToString();
+                menu.Clear();
             }
-            return oRespuesta;
+            return menu;
         }
 
         [HttpGet]
@@ -364,6 +391,103 @@ namespace Tea.site.Controllers
             {
                 return RedirectToAction("Index", "Login");
             }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SubirImagen(IFormFile file, int orden) //List<IFormFile> postedFiles
+        {
+            var response = new RespuestaUsuario();
+            response.estado = true;
+            try
+            {
+                if (file != null && file.Length > 0)
+                {
+                    var flag_file = false;
+                    var type_ = Path.GetExtension(file.FileName);
+                    //var fileNameWE = Path.GetFileNameWithoutExtension(file.FileName);
+                    string fileNameWE = "s00" + orden;
+                    var fileName = "";
+
+                    string[] formatos_permitidos = { ".jpg", ".jpeg", ".png" };
+
+                    if (!formatos_permitidos.Contains(type_.ToLower()))
+                    {
+                        response.estado = false;
+                        response.descripcion = "El archivo cargado no está en el formato requerido (JPG, PNG).";
+                        return Json(response);
+                    }
+                    else
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            file.CopyTo(ms);
+                            var binData = ms.ToArray();
+
+                            // validar imagenes
+                            if (type_.ToLower() == ".jpg" || type_.ToLower() == ".jpeg" || type_.ToLower() == ".png")
+                            {
+                                flag_file = true;
+                            }
+
+                            Bitmap image = new Bitmap(ms);
+                            int width = image.Width;
+                            int height = image.Height;
+
+                            if (width != 1100 && height != 500)
+                            {
+                                response.estado = false;
+                                response.descripcion = "Las dimensiones de la imagen deben ser: 1100px de largo y 500px de ancho.";
+                                return Json(response);
+                            }
+                        }
+                    }
+
+                    if (flag_file)
+                    {
+                        fileName = (fileNameWE + (type_ == ".jpg" ? type_ : ".jpg")).ToLower();
+
+                        string wwwPath = this.Environment.WebRootPath;
+                        string dir = Path.Combine(this.Environment.WebRootPath, "images/carrousel");
+                        string filePath = Path.Combine(dir, Path.GetFileName(fileName));
+
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+                        using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+
+                        //foreach (IFormFile postedFile in postedFiles)
+                        //{
+                        //    string fileName = Path.GetFileName(postedFile.FileName);
+                        //    using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+                        //    {
+                        //        postedFile.CopyTo(stream);
+                        //        uploadedFiles.Add(fileName);
+                        //        ViewBag.Message += string.Format("<b>{0}</b> uploaded.<br />", fileName);
+                        //    }
+                        //}
+                    }
+                    else //si el formato no es correcto
+                    {
+                        response.estado = false;
+                        response.descripcion = "El formato del archivo cargado no es el correcto.";
+                    }
+                }
+                else //si no tiene archivo cargado
+                {
+                    response.estado = false;
+                    response.descripcion = "Error al cargar el archivo.";
+                }
+            }
+            catch (Exception e)
+            {
+                response.estado = false;
+                response.descripcion = "Ocurrió un error cargando el archivo.";
+            }
+            return Json(response);
         }
     }
 

@@ -10,6 +10,11 @@
 
 <div class="bd-example">
     <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <b style="color: #004A92; font-size: 20px;">Registro de citas</b>
+        </div>
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">&nbsp;</div>
+
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 table-responsive">
             <div id="my-calendar"></div>
         </div>
@@ -20,7 +25,7 @@
     <div class="modal-dialog modal-lg" role="document" style="height: 90%; display: grid; place-items: center;">
         <div class="modal-content" style="width: 100%;">
             <div class="modal-header" style="background-color: transparent;">
-                <h5 class="modal-title">Programación de cita</h5>
+                <h5 class="modal-title">Programación</h5>
                 <button onclick="cerrar_modal_cita()" type="button" class="close" aria-label="Close" style="outline: none; cursor: pointer;">
                     <span>&times;</span>
                 </button>
@@ -40,7 +45,7 @@
                                 <div class="form-group">
                                     <span class="label-form">Hora</span><br />
                                     <div class="input-group date" id="dtpicker1">
-                                        <input type="text" class="form-control form-hora" id="txtHora" onkeydown="return false;" onchange="validateHhMm(this);" onpaste="validateHhMm(this);" maxlength="5" placeholder="Ingresar hora" autocomplete="off" />
+                                        <input type="text" class="form-control form-hora" id="txtHora" onkeydown="return false;" onchange="validateHhMm(this);" onpaste="validateHhMm(this);" maxlength="8" placeholder="Seleccionar hora" autocomplete="off" />
                                         <span class="input-group-append input-group-addon">
                                             <span style="margin: 0 auto; display: flex; " class="input-group-text mdi mdi-clock">
                                             </span>
@@ -48,16 +53,30 @@
                                     </div>
                                 </div>
                             </div>
-                            @*<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-                            <div class="form-group">
-                                <span class="label-form">Estado</span><br />
-                                <select class="form-control cbo-search" id="cboEstado2" type="cbo" placeholder="Seleccionar estado">
-                                    <option value="-1">[- Todos -]</option>
-                                    <option value="1">ACTIVO</option>
-                                    <option value="0">INACTIVO</option>
-                                </select>
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                <div class="form-group">
+                                    <span class="label-form">Especialista</span><br />
+                                    <div class="input-group">
+                                        <select class="form-control" id="cboDoctor" onchange="disponibilidad_doctor()">
+                                            <option value="-1">Seleccionar</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>*@
+
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="form-group">
+                                    <table class="table table-responsive" style="display: inline-table;">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Hora</th>
+                                                <th class="text-center">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="divDisponibilidad"></tbody>
+                                    </table>
+                                </div>
+                            </div>
 
                         </div>
                     </div>
@@ -76,8 +95,8 @@
     <link rel="stylesheet" href="~/assets/css/datetimepicker.css" />
 
     <script src="~/basic/zabuto.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
-    <script src="~/basic/moments.js?f=@dHoy.ToString(" yyyyMMddhhmmss")"></script>
-    <script src="~/basic/datetimepicker.js?f=@dHoy.ToString(" yyyyMMddhhmmss")"></script>
+    <script src="~/basic/moments.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
+    <script src="~/basic/datetimepicker.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
 
     <script src="~/basic/registro_citas.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
 }

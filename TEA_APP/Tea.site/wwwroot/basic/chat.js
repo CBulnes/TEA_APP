@@ -682,7 +682,7 @@ function option_type_obj(obj_option, type) {
 }
 
 if (!detectMob()) {
-    $('#div_speak').addClass('hide-element');
+    //$('#div_speak').addClass('hide-element');
 }
 
 function listar_recibos() {

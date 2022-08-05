@@ -9,6 +9,7 @@ namespace Tea.utilities
     {
         public const string sp_validar_usuario = "SP_VALIDAR_USUARIO";
         public const string sp_actualizar_contraseña = "SP_ACTUALIZAR_CONTRASEÑA";
+        public const string sp_listar_doctores = "SP_LISTAR_DOCTORES";
 
 
 

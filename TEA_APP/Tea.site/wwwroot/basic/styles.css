@@ -405,21 +405,30 @@
     height: 200px;
 }
 
-.img_carousel001 {
-    background-image: url('/images/s001.jpg');
+/*.img_carousel001 {
+    background-image: url('/images/carrousel/s001.jpg');
 }
 .img_carousel002 {
-    background-image: url('/images/s002.jpg');
+    background-image: url('/images/carrousel/s002.jpg');
 }
 .img_carousel003 {
-    background-image: url('/images/s003.jpg');
+    background-image: url('/images/carrousel/s003.jpg');
 }
 .img_carousel004 {
-    background-image: url('/images/s004.jpg');
-}
+    background-image: url('/images/carrousel/s004.jpg');
+}*/
 
 .img_atencion {
     height: 70px;
     width: auto;
     place-items: center;
+}
+
+.item_disponible {
+    background-color: #bcffb8;
+    cursor: pointer;
+}
+
+.item_reservado {
+    background-color: #ffdcdc;
 }

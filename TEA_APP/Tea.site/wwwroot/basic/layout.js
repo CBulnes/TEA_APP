@@ -1,4 +1,5 @@
 ﻿var path = ruta;
+var lista_menu = [];
 
 $('.btnCloseSession').on('click', function () {
     $.ajax({
@@ -104,39 +105,59 @@ function build_menu_admin() {
     });
 }
 
-function build_menu_cliente() {
+function build_menu_generico() {
     var menu_ = '';
 
-    menu_ += '<li>';
-    menu_ += '<a class="waves-effect waves-dark" href="Home" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Inicio</span></a>';
-    menu_ += '</li>';
+    $.ajax({
+        url: "/Home/listar_menu",
+        type: "GET",
+        data: null,
+        success: function (data) {
+            lista_menu = data;
 
-    menu_ += '<li>';
-    menu_ += '<a class="waves-effect waves-dark" href="Atencion" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Atención al cliente</span></a>';
-    menu_ += '</li>';
+            for(item of data) {
+                menu_ += '<li>';
+                menu_ += '<a class="waves-effect waves-dark" href="' + item.ruta_opcion + '" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">' + item.nombre_opcion + '</span></a>';
+                menu_ += '</li>';
+            }
+        },
+        error: function (response) {
+            menu_ += '<li>';
+            menu_ += '<a class="waves-effect waves-dark" href="Home" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Inicio</span></a>';
+            menu_ += '</li>';
+        },
+        complete: function () {
+            $('#sidebarnav').append(menu_);
+            $('#sidebarnav').metisMenu();
+        }
+    });
 
-    menu_ += '<li>';
-    menu_ += '<a class="waves-effect waves-dark" href="RegistroCitas" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Registro de citas</span></a>';
-    menu_ += '</li>';
+    //menu_ += '<li>';
+    //menu_ += '<a class="waves-effect waves-dark" href="Home" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Inicio</span></a>';
+    //menu_ += '</li>';
 
-    $('#sidebarnav').append(menu_);
-    $('#sidebarnav').metisMenu();
+    //menu_ += '<li>';
+    //menu_ += '<a class="waves-effect waves-dark" href="RegistroCitas" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Registro de citas</span></a>';
+    //menu_ += '</li>';
+
+    //menu_ += '<li>';
+    //menu_ += '<a class="waves-effect waves-dark" href="HistorialCitas" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Historial de citas</span></a>';
+    //menu_ += '</li>';
 }
 
 /*
  0 - NO CLIENTE
  1 - ADMIN
  2 - CLIENTE
+ 3 - DOCTOR
  */
-if (id_tipousuario == 1) {
-    $('#ChatButton').addClass('hide-element');
-    build_menu_admin();
-} else if (id_tipousuario == 2 || id_tipousuario == 0) {
-    build_menu_cliente();
-
+build_menu_generico();
+if (id_tipousuario == 2) {
     $('.carousel').carousel({
         interval: 300000
     });
+} else {
+    $('#ChatButton').addClass('hide-element');
 }
 
 function validar_flag_chat() {
@@ -168,10 +189,11 @@ setTimeout(function () {
     0 = no cliente
     1 = admin
     2 = cliente
+    3 = doctor
     */
-    if (id_tipousuario == 0 || id_tipousuario == 2) {
+    if (id_tipousuario == 2) {
         validar_flag_chat();
-    } else if (id_tipousuario == 1) {
+    } else {
         $('#buscador').addClass('hide-element');
         $('#mdl_ChatButton, #WAButton').addClass('hide-element');
     }
@@ -340,8 +362,56 @@ function cargar_lista_articulos() {
     });
     //});
 }
-if (id_tipousuario != 1) {
-    cargar_lista_articulos();
+function cargar_lista_busqueda() {
+    var availableTags = [];
+
+    $.ajax({
+        type: "GET",
+        url: path + '/Home/listar_menu',
+        accept: 'application/json',
+        beforeSend: function () {
+            availableTags = [];
+        },
+        success: function (data) {
+            for (var item of data) {
+                var opcion = item.nombre_opcion;
+                availableTags.push(opcion);
+            }
+
+            $("#txt_buscar_articulo").autocomplete({
+                source: availableTags
+            });
+
+            $('#txt_buscar_articulo').keydown(function (e) {
+                if (e.keyCode == 13) {
+                    var valor = $(this).val();
+                    if (valor == '') {
+                        alerta('Seleccione una opción válida', 'info');
+                        return false;
+                    }
+                    else {
+                        if (availableTags.includes(valor)) {
+                            $(this).val('');
+
+                            for (item of lista_menu) {
+                                if (item.nombre_opcion == valor) {
+                                    window.location.href = '/' + item.ruta_opcion;
+                                }
+                            }
+
+                            return false;
+                        } else {
+                            alerta('La opción seleccionada es incorrecto', 'info');
+                            return false;
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+if (id_tipousuario == 2) {
+    cargar_lista_busqueda();
 }
 
 function abrir_buscador() {
@@ -358,3 +428,76 @@ $(document).ready(function () {
         $('.img_carousel').attr('style', 'height: ' + (parseInt(hcf) - 100).toString() + 'px;');
     })
 })
+
+function validar_orden() {
+    var orden = $('#cboOrden').val();
+
+    if (orden == '-1') {
+        alert('Seleccione el orden de la imagen a cargar.');
+        return;
+    }
+    $('#fuImagen').trigger('click')
+}
+
+$('.uploader').fileupload({
+    add: function (e, data) {
+        data.url = '/Home/SubirImagen';
+        data.formData = {
+            orden: $('#cboOrden').val()
+        };
+
+        var uploadErrors = [];
+
+        var length_ = data.originalFiles[0]['type'].length;
+
+        if (length_ == 0 || data.originalFiles[0]['size'] > 2097152) {
+            uploadErrors.push('El archivo es muy grande. El tamaño máximo es de 2MB.');
+        }
+
+        if (uploadErrors.length > 0) {
+            //alertWarning("Error", uploadErrors.join("\n"));
+            alert(uploadErrors.join("\n"));
+            return;
+        }
+        data.submit();
+    },
+    dataType: 'json',
+    done: function (e, data) {
+        if (data.result.estado) {
+            /*alertSuccess("Muy bien", "Archivo cargado correctamente.");*/
+            alert("Archivo cargado correctamente.");
+            $('#cboOrden').val(-1);
+
+            setTimeout(function () {
+                location.reload();
+            }, 2000);
+
+            return;
+        } else {
+            /*alertWarning("Atención", data.result.message);*/
+            alert(data.result.descripcion);
+            return;
+        }
+    }
+}).prop('disabled', !$.support.fileInput);
+
+function carrousel() {
+    setTimeout(function () {
+        $('.img_carousel001').css("background-image", "url('/images/carrousel/s001.jpg?r=" + makeid(6) + ")");
+        $('.img_carousel002').css("background-image", "url('/images/carrousel/s002.jpg?r=" + makeid(6) + ")");
+        $('.img_carousel003').css("background-image", "url('/images/carrousel/s003.jpg?r=" + makeid(6) + ")");
+        $('.img_carousel004').css("background-image", "url('/images/carrousel/s004.jpg?r=" + makeid(6) + ")");
+    }, 1000);
+}
+carrousel();
+
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
+}

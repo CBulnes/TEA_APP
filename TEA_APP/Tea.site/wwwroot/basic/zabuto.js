@@ -695,6 +695,9 @@ function datos_dia(d) {
 
     $('#txtFecha').attr('data-fecha', fecha);
     $('#txtFecha').val(fecha_formato_ddmmyyyy(fecha));
+
+    disponibilidad_doctor();
+
     $('#mdl_cita').modal('show');
 }
 
