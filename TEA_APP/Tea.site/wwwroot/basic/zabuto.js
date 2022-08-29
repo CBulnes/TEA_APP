@@ -344,7 +344,7 @@ $.fn.zabuto_calendar = function (options) {
                             dia_actual_class = '';
                         }
 
-                        var datos_marcacion = contenido_marcacion_dia(currDayOfMonth, month, year);
+                        var datos_marcacion = contenido_cita(currDayOfMonth, month, year);
                         var $dayElement = $('<div id="' + dayId + '" class="day' + dia_actual_class + dia_inhabilitado_class + dia_feriado_class + '" ><span class="' + validar_feriado(currDayOfMonth, month, year) + '">' + currDayOfMonth + '</span></div>' + datos_marcacion);
 
                         $dayElement.data('day', currDayOfMonth);
@@ -690,14 +690,17 @@ function fnctn_removeClass(el, className) {
 
 var fechas = [];
 function datos_dia(d) {
+    return;
     var id_ = d.getAttribute('id');
     var fecha = id_.slice(-10);
 
     $('#txtFecha').attr('data-fecha', fecha);
     $('#txtFecha').val(fecha_formato_ddmmyyyy(fecha));
 
-    disponibilidad_doctor();
+    $('#txtHora').val('');
+    $('#cboDoctor').val(-1);
 
+    disponibilidad_doctor();
     $('#mdl_cita').modal('show');
 }
 
@@ -773,11 +776,11 @@ function verificar_feriado(dia, mes, año) {
 
     var fecha = año + '-' + formato_2_digitos(mes) + '-' + formato_2_digitos(dia);
 
-    var lista_marcaciones_dia = lista_marcaciones.filter(function (element) {
+    var lista_citas_dia = lista_citas.filter(function (element) {
         return element.fecha_marcacion == fecha;
     });
 
-    if (lista_marcaciones_dia.length > 0 && lista_marcaciones_dia[0].tipo_marcacion == 'FERIADO') {
+    if (lista_citas_dia.length > 0 && lista_citas_dia[0].tipo_marcacion == 'FERIADO') {
         return ' dia_feriado ';
     }
     return '';
@@ -807,61 +810,107 @@ function fecha_actual() {
     return yyyy + '-' + mm + '-' + dd;
 }
 
-function contenido_marcacion_dia(dia, mes, año) {
+function contenido_cita(dia, mes, año) {
     var html = '';
-    return '<span>prueba</span>';
+    var date;
+    var dia_nombre;
+    var dia_, mes_, año_;
+
     if (mes == 12) { mes = 1; } else { mes++; }
 
     var fecha = año + '-' + formato_2_digitos(mes) + '-' + formato_2_digitos(dia);
-    var lista_marcaciones_dia = lista_marcaciones.filter(function (element) {
-        return element.fecha_marcacion == fecha && element.tipo_marcacion != 'FERIADO';
+    var lista_citas_dia = lista_citas.filter(function (element) {
+        return element.fecha_cita == fecha;// && element.tipo_marcacion != 'FERIADO';
     });
 
-    if (lista_marcaciones_dia.length == 0) {
-        html = '';
+    if (lista_citas_dia.length == 0) {
+        dia_ = fecha.slice(-2);
+        mes_ = fecha.substring(0, 7).slice(-2);
+        año_ = fecha.substring(0, 4);
+
+        date = new Date(mes_ + '/' + dia_ + '/' + año_); //mm/dd/yyyy
+        dia_nombre = date.toLocaleDateString('es-ES', { weekday: 'long' });
+
+        if (dia_nombre == 'sábado' || dia_nombre == 'domingo') {
+            html = '-';
+        } else {
+            html = '';
+        }
     } else {
-        for (var item of lista_marcaciones_dia) {
-            if (item.tipo_marcacion == 'INGRESO' || item.tipo_marcacion == 'TARDANZA' || item.tipo_marcacion == 'SALIDA' || item.tipo_marcacion == 'HORAS NO LABORADAS'
-                || item.tipo_marcacion == 'INGRESO-OMISION' || item.tipo_marcacion == 'SALIDA-OMISION') {
-                html += '<div class="info_marcacion small_">';
-                if (item.tipo_marcacion == 'TARDANZA' || item.tipo_marcacion == 'HORAS NO LABORADAS') {
-                    html += '<span class="span_in_out" style="color: red !important;">' + capitalize(item.tipo_marcacion) + '</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
-                } else if (item.tipo_marcacion == 'INGRESO-OMISION') {
-                    html += '<span class="span_in_out" style="background-color: yellow !important; display: table;">Ingreso</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
-                } else if (item.tipo_marcacion == 'SALIDA-OMISION') {
-                    html += '<span class="span_in_out" style="background-color: yellow !important; display: table;">Salida</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
-                }
-                else {
-                    html += '<span class="span_in_out">' + capitalize(item.tipo_marcacion) + '</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
-                }
-                html += '</div>';
-            }
+        for (var item of lista_citas_dia) {
+            dia_ = item.fecha_cita.slice(-2);
+            mes_ = item.fecha_cita.substring(0, 7).slice(-2);
+            año_ = item.fecha_cita.substring(0, 4);
 
-            //if (item.tipo_marcacion == 'COMPENSACIÓN') {
-            //    html += '<div class="info_marcacion"><span class="span_compensacion">' + item.desc1 + '</span></div>';
-            //}
+            date = new Date(mes_ + '/' + dia_ + '/' + año_); //mm/dd/yyyy
+            dia_nombre = date.toLocaleDateString('es-ES', { weekday: 'long' });
 
-            if (item.tipo_marcacion == 'FALTA (INGRESO)' || item.tipo_marcacion == 'FALTA (SALIDA)') {
-                html += '<div class="info_marcacion">';
-                if (item.tipo_marcacion == 'FALTA (INGRESO)') {
-                    html += '<span class="span_falta">Ingreso</span><br/><span class="span_hour" style="color: #FF6877 !important;">FALTA</span>';
-                } else {
-                    html += '<span class="span_falta">Salida</span><br/><span class="span_hour" style="color: #FF6877 !important;">FALTA</span>';
-                }
-                html += '</div>';
-            }
+            if (dia_nombre == 'sábado' || dia_nombre == 'domingo') {
+                html = '-';
+            } else {
+                var clase_estado = item.estado == 'REGISTRADO' ? 'div_cita_registrada' : 'div_cita_atendida';
 
-            if (item.tipo_marcacion == 'VACACIONES') {
-                html += '<div class="info_marcacion"><span class="span_vacaciones">Vacaciones</span></div>';
-            }
-
-            if (item.tipo_marcacion == 'PAPELETA') {
-                html += '<div class="info_papeleta"><span class="span_papeleta">Papeleta - ' + item.desc1 + '</span><span class="span_papeleta2">Estado:&nbsp;' + item.desc2 + '</span></div>';
+                html += '<div class="div_cita ' + clase_estado + '" data-id-cita="' + item.id_cita + '" data-id-especialista="' + item.id_doctor_asignado + '" data-fecha-cita="' + item.fecha_cita + '" data-hora-cita="' + item.hora_cita + '" data-estado="' + item.estado + '" onclick="ver_cita(this)">';
+                html += 'Especialista: ' + item.doctor_asignado + '<br/>';
+                html += 'Hora: ' + item.hora_cita;
+                html += '</div > ';
             }
         }
     }
 
+    if (html != '-') {
+        html += '<button data-id-cita="0" data-id-especialista="-1" data-fecha-cita="' + fecha + '" data-hora-cita="" data-estado="-" onclick="ver_cita(this)" class="btn btn-primary">+</button>';
+    }
+
     return html;
+
+    
+
+    //if (lista_citas_dia.length == 0) {
+    //    html = '';
+    //} else {
+    //    for (var item of lista_citas_dia) {
+    //        if (item.tipo_marcacion == 'INGRESO' || item.tipo_marcacion == 'TARDANZA' || item.tipo_marcacion == 'SALIDA' || item.tipo_marcacion == 'HORAS NO LABORADAS'
+    //            || item.tipo_marcacion == 'INGRESO-OMISION' || item.tipo_marcacion == 'SALIDA-OMISION') {
+    //            html += '<div class="info_marcacion small_">';
+    //            if (item.tipo_marcacion == 'TARDANZA' || item.tipo_marcacion == 'HORAS NO LABORADAS') {
+    //                html += '<span class="span_in_out" style="color: red !important;">' + capitalize(item.tipo_marcacion) + '</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
+    //            } else if (item.tipo_marcacion == 'INGRESO-OMISION') {
+    //                html += '<span class="span_in_out" style="background-color: yellow !important; display: table;">Ingreso</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
+    //            } else if (item.tipo_marcacion == 'SALIDA-OMISION') {
+    //                html += '<span class="span_in_out" style="background-color: yellow !important; display: table;">Salida</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
+    //            }
+    //            else {
+    //                html += '<span class="span_in_out">' + capitalize(item.tipo_marcacion) + '</span><br/><span class="span_hour">' + item.hora_marcacion + '</span>';
+    //            }
+    //            html += '</div>';
+    //        }
+
+    //        //if (item.tipo_marcacion == 'COMPENSACIÓN') {
+    //        //    html += '<div class="info_marcacion"><span class="span_compensacion">' + item.desc1 + '</span></div>';
+    //        //}
+
+    //        if (item.tipo_marcacion == 'FALTA (INGRESO)' || item.tipo_marcacion == 'FALTA (SALIDA)') {
+    //            html += '<div class="info_marcacion">';
+    //            if (item.tipo_marcacion == 'FALTA (INGRESO)') {
+    //                html += '<span class="span_falta">Ingreso</span><br/><span class="span_hour" style="color: #FF6877 !important;">FALTA</span>';
+    //            } else {
+    //                html += '<span class="span_falta">Salida</span><br/><span class="span_hour" style="color: #FF6877 !important;">FALTA</span>';
+    //            }
+    //            html += '</div>';
+    //        }
+
+    //        if (item.tipo_marcacion == 'VACACIONES') {
+    //            html += '<div class="info_marcacion"><span class="span_vacaciones">Vacaciones</span></div>';
+    //        }
+
+    //        if (item.tipo_marcacion == 'PAPELETA') {
+    //            html += '<div class="info_papeleta"><span class="span_papeleta">Papeleta - ' + item.desc1 + '</span><span class="span_papeleta2">Estado:&nbsp;' + item.desc2 + '</span></div>';
+    //        }
+    //    }
+    //}
+
+    //return html;
 }
 
 function validar_feriado(dia, mes, año) {
@@ -873,11 +922,11 @@ function validar_feriado(dia, mes, año) {
 
     var fecha = año + '-' + formato_2_digitos(mes) + '-' + formato_2_digitos(dia);
 
-    var lista_marcaciones_dia = lista_marcaciones.filter(function (element) {
+    var lista_citas_dia = lista_citas.filter(function (element) {
         return element.fecha_marcacion == fecha && element.tipo_marcacion == 'FERIADO';
     });
 
-    if (lista_marcaciones_dia.length == 0) {
+    if (lista_citas_dia.length == 0) {
         return '';
     } else {
         return 'class_feriado';

@@ -15,7 +15,7 @@
         </div>
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">&nbsp;</div>
 
-        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 table-responsive">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 table-responsive calendar-container">
             <div id="my-calendar"></div>
         </div>
     </div>
@@ -41,6 +41,12 @@
                                     <input class="form-control" type="text" id="txtFecha" autocomplete="off" disabled="disabled" />
                                 </div>
                             </div>
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="divReasignar">
+                                <div class="form-group">
+                                    <span class="label-form">Fecha reasignar</span><br />
+                                    <input class="form-control" type="date" id="txtFechaReasignar" autocomplete="off" max="2050-12-31" min="2022-08-01" onkeydown="return false" />
+                                </div>
+                            </div>
                             <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
                                 <div class="form-group">
                                     <span class="label-form">Hora</span><br />
@@ -57,7 +63,7 @@
                                 <div class="form-group">
                                     <span class="label-form">Especialista</span><br />
                                     <div class="input-group">
-                                        <select class="form-control" id="cboDoctor" onchange="disponibilidad_doctor()">
+                                        <select class="form-control" id="cboDoctor" onchange="verificar_disponibilidad()">
                                             <option value="-1">Seleccionar</option>
                                         </select>
                                     </div>
@@ -84,7 +90,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="cerrar_modal_cita()">Volver</button>
-                <button type="button" class="btn btn-primary" onclick="guardar_cita()">Guardar</button>
+                <button type="button" class="btn btn-primary" onclick="guardar_cita()" id="btnGuardarCita">Guardar</button>
             </div>
         </div>
     </div>

@@ -81,5 +81,41 @@ namespace Tea.DA
             return lista;
         }
 
+        public List<Cita> citas_usuario(int id_usuario, string main_path, string random_str)
+        {
+            List<Cita> lista = new List<Cita>();
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand("SP_LISTAR_CITAS_USUARIO", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@id_usuario", SqlDbType.Int).Value = id_usuario;
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    Cita cita = new Cita();
+                    cita.id_cita = Convert.ToInt32(row["id_cita"]);
+                    cita.id_estado_cita = Convert.ToInt32(row["id_estado_cita"]);
+                    cita.estado = Convert.ToString(row["estado"]);
+                    cita.fecha_cita = Convert.ToString(row["fecha_cita"]);
+                    cita.hora_cita = Convert.ToString(row["hora_cita"]);
+                    cita.id_doctor_asignado = Convert.ToInt32(row["id_doctor_asignado"]);
+                    cita.doctor_asignado = Convert.ToString(row["doctor_asignado"]);
+                    lista.Add(cita);
+                }
+            }
+            catch (Exception e)
+            {
+                //LOG.registrarLog("(Excepcion " + random_str + ")[ERROR]->[CitaDA.cs / disponibilidad_doctor <> " + e.Message.ToString(), "ERROR", main_path);
+                lista.Clear();
+            }
+            cn.Close();
+            return lista;
+        }
+
     }
 }

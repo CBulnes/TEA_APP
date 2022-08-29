@@ -1,37 +1,77 @@
 ﻿var path = ruta;
 
-var lista_marcaciones = [];
+var lista_citas = [];
+var id_cita_ = 0;
+var estado_ = '';
 
 function cargar_citas() {
-    //$.ajax({
-    //    url: '/Asistencia/getMarcacionesDia?tipo=GENERAL',
-    //    type: "GET",
-    //    data: {},
-    //    success: function (data) {
-    //        lista_marcaciones = data;
-    //    },
-    //    error: function (response) {
-    //        alertSecondary("Mensaje", "Ocurrió un error al obtener su registro de marcaciones.");
-    //        lista_marcaciones = [];
-    //    },
-    //    complete: function () {
-    //        $("#my-calendar").zabuto_calendar({
-    //            legend: []
-    //        });
-    //        setTimeout(function () {
-    //            cargar_vista_semanal('INIT');
-    //        }, 500);
-    //    }
-    //});
-    lista_marcaciones = [
-        { 'estado': 'PENDIENTE', 'fecha_cita': '2022-08-15' }
-    ];
+    $.ajax({
+        url: '/RegistroCitas/CitasUsuario',
+        type: "GET",
+        data: {},
+        success: function (data) {
+            lista_citas = data;
+        },
+        error: function (response) {
+            alertSecondary("Mensaje", "Ocurrió un error al obtener su registro de citas.");
+            lista_citas = [];
+        },
+        complete: function () {
+            $("#my-calendar").zabuto_calendar({
+                legend: []
+            });
 
-    $("#my-calendar").zabuto_calendar({
-        legend: []
+            validar_cambio_fecha();
+        }
     });
+
+    //lista_citas = [
+    //    { 'estado': 'PENDIENTE', 'fecha_cita': '2022-08-15', 'doctor_asignado': 'Doctor1', 'hora_cita': '13:00PM', 'id_doctor_asignado': 2, 'id_cita': 1 }
+    //];
+
+    //$("#my-calendar").zabuto_calendar({
+    //    legend: []
+    //});
 }
 cargar_citas();
+
+function validar_cambio_fecha() {
+    $('#txtFechaReasignar').on('change', function () {
+        $('#txtHora').val('').attr('data-hora', '');
+        disponibilidad_reasignar_doctor();
+    })
+}
+
+function ver_cita(e) {
+    var id_cita = $(e).attr('data-id-cita');
+    var id_especialista = $(e).attr('data-id-especialista');
+    var hora_Cita = $(e).attr('data-hora-cita');
+    var estado = $(e).attr('data-estado');
+    var fecha_cita = $(e).attr('data-fecha-cita');
+
+    cargar_datos_cita(id_cita, id_especialista, fecha_cita, hora_Cita, estado);
+}
+
+function cargar_datos_cita(id_cita, id_doctor, fecha, hora, estado) {
+
+    $('#txtFecha').attr('data-fecha', fecha);
+    $('#txtFecha').val(fecha_formato_ddmmyyyy(fecha));
+    $('#txtHora').val(hora).attr('data-hora', hora);
+    $('#cboDoctor').val(id_doctor).attr('data-id-doctor', id_doctor);//.change();
+
+    if (id_cita == 0) {
+        $('#txtFechaReasignar').val('');
+        $('#divReasignar').hide();
+    } else {
+        $('#txtFechaReasignar').val(fecha);
+        $('#divReasignar').show();
+    }
+
+    estado_ = estado;
+    id_cita_ = id_cita;
+
+    verificar_disponibilidad();
+}
 
 function cargar_lista_doctores() {
     var html = '';
@@ -68,6 +108,10 @@ $('#dtpicker1').datetimepicker({
 
 function guardar_cita() {
     var fecha = $('#txtFecha').attr('data-fecha');
+    var fecha_r = $('#txtFechaReasignar').val();
+    if (fecha_r != '') {
+        fecha = fecha_r;
+    }
     var hora = $('#txtHora').val();
     var doctor = $('#cboDoctor').val();
 
@@ -84,7 +128,7 @@ function guardar_cita() {
     }
 
     var data_ = {
-        id_cita: 0,
+        id_cita: id_cita_,
         id_usuario: 0,
         estado_cita: 0,
         fecha_cita: fecha,
@@ -106,6 +150,9 @@ function guardar_cita() {
                 $('#txtHora').val('');
                 $('#cboDoctor').val('-1');
                 $('#mdl_cita').modal('hide');
+
+                $('.calendar-container').html('<div id="my-calendar"></div>');
+                cargar_citas();
             } else {
                 /*alertWarning("Atención", data.message);*/
                 alert(data.descripcion);
@@ -114,8 +161,10 @@ function guardar_cita() {
         },
         error: function (response) {
             /*alertWarning("Atención", "Ocurrió un error al guardar la cita.");*/
-            aler("Ocurrió un error al guardar la cita.");
+            alert("Ocurrió un error al guardar la cita.");
             //$("#load_data").hide();
+        },
+        complete: function () {
         }
     });
 }
@@ -129,8 +178,67 @@ function validateHhMm(e) {
     }
 }
 
-function disponibilidad_doctor() {    
+function verificar_disponibilidad() {
+    if ($('#divReasignar').is(':visible')) {
+        disponibilidad_reasignar_doctor();
+    } else {
+        disponibilidad_doctor();
+    }
+
+    var id_doc = $('#cboDoctor').val();
+    var id_doc_ant = $('#cboDoctor').attr('data-id-doctor');
+
+    if ((id_doc != id_doc_ant && $('#divReasignar').is(':visible')) || id_cita_ == 0) {
+        $('#txtHora').val('').attr('data-hora', '');
+    }
+}
+
+function disponibilidad_doctor() {
     var fecha = $('#txtFecha').attr('data-fecha');
+    var doctor = $('#cboDoctor').val();
+    var html = '';
+
+    $.ajax({
+        url: "/RegistroCitas/DisponibilidadDoctor?id_doctor=" + doctor + "&fecha=" + fecha,
+        type: "GET",
+        data: null,
+        beforeSend: function () {
+            $('#cboDoctor, #txtHora, #btnGuardarCita').removeAttr('disabled');
+            if (doctor == '-1') {
+                $('#divDisponibilidad').html('<tr><td colspan="2" class="text-center">Seleccione un especialista</td></tr>');
+            }
+        },
+        success: function (data) {
+            if (data.length > 0) {
+                for (item of data) {
+                    var clase = item.estado == 'DISPONIBLE' ? 'item_disponible' : 'item_reservado';
+                    var hora = item.estado == 'DISPONIBLE' ? item.hora_cita : '';
+                    var accion = ' onclick="seleccionar_hora_disponible(this)" data-hora="' + hora + '"';
+                    html += '<tr class="' + clase + '"' + accion + '><td class="text-center">' + item.hora_cita + '</td><td class="text-center">' + item.estado + '</td></tr>';
+                }
+            }
+        },
+        error: function (response) {
+            $('#divDisponibilidad').html('<tr><td colspan="2" class="text-center">Seleccione un especialista</td></tr>');
+        },
+        complete: function () {
+            if (estado_ == 'ATENDIDO') {
+                $('#divDisponibilidad').html('<tr><td colspan="2" class="text-center">La cita ya ha sido atendida</td></tr>');
+                $('#cboDoctor, #txtHora, #btnGuardarCita').attr('disabled', true);
+                $('#txtFechaReasignar').val('');
+                $('#divReasignar').hide();
+            } else {
+                if (doctor != '-1') {
+                    $('#divDisponibilidad').html(html);
+                }
+            }
+            $('#mdl_cita').modal('show');
+        }
+    });
+}
+
+function disponibilidad_reasignar_doctor() {
+    var fecha = $('#txtFechaReasignar').val();
     var doctor = $('#cboDoctor').val();
     var html = '';
 
@@ -160,6 +268,8 @@ function disponibilidad_doctor() {
             if (doctor != '-1') {
                 $('#divDisponibilidad').html(html);
             }
+
+            $('#mdl_cita').modal('show');
         }
     });
 }

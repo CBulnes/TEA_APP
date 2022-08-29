@@ -212,7 +212,7 @@ namespace Tea.site.Controllers
                 else if (tipo_usuario == "CLIENTE")
                 {
                     menu.Add(new Menu { nombre_opcion = "Registro de citas", ruta_opcion = "RegistroCitas" });
-                    menu.Add(new Menu { nombre_opcion = "Historial de citas", ruta_opcion = "HistorialCitas" });
+                    //menu.Add(new Menu { nombre_opcion = "Historial de citas", ruta_opcion = "HistorialCitas" });
                 }
                 else if (tipo_usuario == "DOCTOR" || tipo_usuario == "ESPECIALISTA")
                 {

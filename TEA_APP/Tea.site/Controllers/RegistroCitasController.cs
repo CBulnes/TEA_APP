@@ -17,6 +17,7 @@ namespace Tea.site.Controllers
         private string url_lista_doctores = Helper.GetUrlApi() + "/api/usuario/listar_doctores";
         private string url_registrar_cita = Helper.GetUrlApi() + "/api/cita/registrar_cita";
         private string url_disponibilidad_doctor = Helper.GetUrlApi() + "/api/cita/disponibilidad_doctor";
+        private string url_citas_usuario = Helper.GetUrlApi() + "/api/cita/citas_usuario";
 
         private string url = "";
         dynamic obj = new System.Dynamic.ExpandoObject();
@@ -129,6 +130,27 @@ namespace Tea.site.Controllers
             try
             {
                 url = url_disponibilidad_doctor + "/" + id_doctor + "/" + fecha;
+                res = ApiCaller.consume_endpoint_method(url, null, "GET");
+                lista = JsonConvert.DeserializeObject<List<Cita>>(res);
+            }
+            catch (Exception)
+            {
+                lista.Clear();
+            }
+            return lista;
+        }
+
+        [HttpGet]
+        //[AllowAnonymous]
+        //[ResponseCache(NoStore = true, Duration = 0)]
+        public async Task<List<Cita>> CitasUsuario()
+        {
+            int id_usuario = Convert.ToInt32(HttpContext.Session.GetInt32("id_usuario"));
+            List<Cita> lista = new List<Cita>();
+            string res = "";
+            try
+            {
+                url = url_citas_usuario + "/" + id_usuario;
                 res = ApiCaller.consume_endpoint_method(url, null, "GET");
                 lista = JsonConvert.DeserializeObject<List<Cita>>(res);
             }

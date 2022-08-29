@@ -44,5 +44,19 @@ namespace Tea.BL
             return lista;
         }
 
+        public List<Cita> citas_usuario(int id_usuario, string main_path, string random_str)
+        {
+            List<Cita> lista = new List<Cita>();
+            try
+            {
+                lista = citaDA.citas_usuario(id_usuario, main_path, random_str);
+            }
+            catch (Exception)
+            {
+                lista.Clear();
+            }
+            return lista;
+        }
+
     }
 }
