@@ -26,6 +26,7 @@ namespace Tea.api.Controllers
         }
 
         CitaBL citaBL = new CitaBL();
+        HistorialBL historialBL = new HistorialBL();
         RandomUtilities ru = new RandomUtilities();
 
         string res = "";
@@ -82,6 +83,54 @@ namespace Tea.api.Controllers
                 lista.Clear();
             }
             return lista;
+        }
+
+        [HttpGet("citas_doctor/{id_usuario}/{fecha}/{id_estado}")]
+        public List<Cita> citas_doctor(int id_usuario, string fecha, int id_estado)
+        {
+            List<Cita> lista = new List<Cita>();
+            try
+            {
+                lista = citaBL.citas_doctor(id_usuario, fecha, id_estado);
+            }
+            catch (Exception)
+            {
+                lista.Clear();
+            }
+            return lista;
+        }
+
+        [HttpGet("historial_usuario/{id_usuario}")]
+        public List<HistorialPaciente> historial_usuario(int id_usuario)
+        {
+            List<HistorialPaciente> lista = new List<HistorialPaciente>();
+            try
+            {
+                lista = historialBL.listar_historial(id_usuario);
+            }
+            catch (Exception)
+            {
+                lista.Clear();
+            }
+            return lista;
+        }
+
+        [HttpPost("registrar_historial")]
+        public RespuestaUsuario RegistrarHistorial([FromBody] HistorialPaciente oHistorial)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            random_str = ru.RandomString(8) + "|" + ru.CurrentDate();
+
+            try
+            {
+                res_ = historialBL.registrar_historial(oHistorial);
+            }
+            catch (Exception)
+            {
+                res_.descripcion = "Ocurrió un error al registrar la información.";
+                res_.estado = false;
+            }
+            return res_;
         }
 
     }

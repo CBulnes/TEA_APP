@@ -61,13 +61,17 @@ namespace Tea.site.Controllers
                 obj.call_center_invitado = Helper.GetCallCenterInvitado();
 
                 string vista = "";
-                if (obj.id_tipousuario == 1 || obj.id_tipousuario == 3) //admin o doctor
+                if (obj.id_tipousuario == 1) //admin
                 {
                     vista = "IndexAdmin";
                 }
-                if (obj.id_tipousuario == 2 || obj.id_tipousuario == 0) //cliente
+                if (obj.id_tipousuario == 2) //cliente
                 {
                     vista = "Index";
+                }
+                if (obj.id_tipousuario == 3) //doctor
+                {
+                    vista = "IndexDoctor";
                 }
                 return View(vista, obj);
             }
@@ -212,7 +216,6 @@ namespace Tea.site.Controllers
                 else if (tipo_usuario == "CLIENTE")
                 {
                     menu.Add(new Menu { nombre_opcion = "Registro de citas", ruta_opcion = "RegistroCitas" });
-                    //menu.Add(new Menu { nombre_opcion = "Historial de citas", ruta_opcion = "HistorialCitas" });
                 }
                 else if (tipo_usuario == "DOCTOR" || tipo_usuario == "ESPECIALISTA")
                 {
@@ -221,8 +224,6 @@ namespace Tea.site.Controllers
             }
             catch (Exception ex)
             {
-                //oRespuesta.estado = "ERROR";
-                //oRespuesta.descripcion = ex.Message.ToString();
                 menu.Clear();
             }
             return menu;

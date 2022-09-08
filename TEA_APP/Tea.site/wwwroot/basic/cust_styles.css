@@ -130,3 +130,7 @@
     border-radius: 20% !important;
     box-shadow: 3px 3px 0px rgb(60 60 60 / 50%) !important;
 }
+
+.text-tbl {
+    font-size: 12px;
+}

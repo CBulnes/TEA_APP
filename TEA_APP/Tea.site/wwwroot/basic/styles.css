@@ -385,6 +385,20 @@ button.main_color {
     background-color: #ff6060 !important;
 }
 
+.btn_pendiente {
+    background-color: #e40000;
+    color: #FFF;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.btn_atendido {
+    background-color: #04aa21;
+    color: #FFF;
+    font-weight: 500;
+    font-size: 12px;
+}
+
 .sidebar-nav ul li a, .sidebar-nav > ul > li > a i {
     color: #FFF !important;
 }
