@@ -859,7 +859,7 @@ function contenido_cita(dia, mes, año) {
     }
 
     if (html != '-') {
-        html += '<button data-id-cita="0" data-id-especialista="-1" data-fecha-cita="' + fecha + '" data-hora-cita="" data-estado="-" onclick="ver_cita(this)" class="btn btn-primary">+</button>';
+        html += '<button data-id-cita="0" data-id-especialista="-1" data-fecha-cita="' + fecha + '" data-hora-cita="" data-estado="-" onclick="ver_cita(this)" class="btn btn-primary main_color">+</button>';
     }
 
     return html;

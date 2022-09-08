@@ -51,8 +51,9 @@
 }
 
 #btnCloseSession01:hover {
-    background: #f2f4f8;
-    color: #009efb;
+    background: #ff6060;
+    color: #FFFFFF;
+    /*color: #009efb;*/
     text-decoration: none;
 }
 
@@ -62,7 +63,7 @@
     display: block;
     color: #99abb4;
     width: 100%;
-    text-align: left;
+    text-align: right;
     border: 0px;
     margin: 6px;
     margin-left: 0px;
@@ -123,4 +124,9 @@
 
 .req-pass-er {
     color: #ff0000;
+}
+
+.floating-wpp-button {
+    border-radius: 20% !important;
+    box-shadow: 3px 3px 0px rgb(60 60 60 / 50%) !important;
 }

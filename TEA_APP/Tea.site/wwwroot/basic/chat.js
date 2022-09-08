@@ -10,8 +10,12 @@ $(document).ready(function () {
 
 //var bot_img = path + "/images/bot.jpg";
 //var person_img = path + "/images/me.jpg";
-var bot_img = 'https://freesvg.org/img/1538298822.png';
-var person_img = 'https://icons.iconarchive.com/icons/graphicloads/flat-finance/256/person-icon.png';
+
+var bot_img = path + "/images/bot.jpg";
+//var bot_img = 'https://freesvg.org/img/1538298822.png';
+
+var person_img = path + '/images/user.png';
+//var person_img = 'https://icons.iconarchive.com/icons/graphicloads/flat-finance/256/person-icon.png';
 
 $('#img_chat').attr('src', bot_img);
 
@@ -202,7 +206,7 @@ function validar_flujo_existente() {
                     var html_img = '';
 
                     html_img += '<li>';
-                    html_img += '<div class="chat-img"><img src="https://freesvg.org/img/1538298822.png" class="invisible-element" /></div>';
+                    html_img += '<div class="chat-img"><img src="' + bot_img + '" class="invisible-element" /></div>';
                     html_img += '<div class="chat-content" style="display: inline-grid;">';
                     html_img += '<div class="box bg-success"><div class="row">';
 
@@ -521,7 +525,7 @@ function enviar_consulta() {
                 _label == '';
             },
             success: function (response) {
-                console.log('aca: ' +  response);
+                console.log('RESPONSE CHAT: ' +  response);
 
                 $('.dots_container_').parent().remove();
 

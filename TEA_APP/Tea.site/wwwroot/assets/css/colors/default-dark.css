@@ -115,7 +115,8 @@ a.link:hover, a.link:focus {
 /*sidebar navigation
 *******************/
 .card-no-border .left-sidebar, .card-no-border .sidebar-nav {
-    background: #4272d7;
+    background: #ff6060;
+    /*background: #4272d7;*/
     /*    background: #272c33;*/
 }
 

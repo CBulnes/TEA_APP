@@ -91,7 +91,7 @@
     /*border-radius: 0 15px 15px 0 !important;
     background-color: rgba(0,0,0,0.3) !important;*/
     border: 0 !important;
-    color: #4272d7 !important; /*#272c33 !important;*/
+    color: #565656 !important; /*#272c33 !important;*/
     cursor: pointer;
     font-size: 24px;
 }
@@ -374,11 +374,15 @@
 }
 
 .main_color {
-    background-color: #4272d7 !important;
+    background-color: #565656 !important;
+}
+
+button.main_color {
+    border-color: #565656 !important;
 }
 
 .second_color {
-    background-color: #74abfd !important;
+    background-color: #ff6060 !important;
 }
 
 .sidebar-nav ul li a, .sidebar-nav > ul > li > a i {
@@ -386,11 +390,13 @@
 }
 
 .mini-sidebar .sidebar-nav #sidebarnav > li:hover > a {
-    background: #74abfd !important;
+    background: #ff8a8a !important;
+    /*background: #74abfd !important;*/
 }
 
 .sidebar-nav ul li a:hover {
-    background: #74abfd;
+    background: #ff8a8a;
+    /*background: #74abfd;*/
 }
 
 .chat-img > img {
