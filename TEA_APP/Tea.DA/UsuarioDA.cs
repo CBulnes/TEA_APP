@@ -39,6 +39,7 @@ namespace Tea.DA
                     usuario.tipo_documento = Convert.ToString(row["tipo_documento"]);
                     usuario.num_documento = Convert.ToString(row["num_documento"]);
                     usuario.validacion = Convert.ToString(row["validacion"]);
+                    usuario.test_actual = Convert.ToInt32(row["test_actual"]);
                 }
             }
             catch (Exception e)

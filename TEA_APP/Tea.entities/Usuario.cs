@@ -18,5 +18,6 @@ namespace Tea.entities
 		public string tipo_documento { get; set; } = "";
 		public string num_documento { get; set; } = "";
 		public string validacion { get; set; } = "";
+		public int test_actual { get; set; } = 0;
 	}
 }

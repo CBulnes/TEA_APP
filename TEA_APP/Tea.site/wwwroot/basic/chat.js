@@ -4,6 +4,8 @@ var msg_previo = '';
 
 var _label = ''
 
+var ultMsg = '';
+
 $(document).ready(function () {
     $('#txtMessage').focus();
 });
@@ -65,7 +67,7 @@ function append_msg(msg, sender, type_source, list) {
         } else {
             content += '<li>';
         }
-        
+
         content += '<div class="chat-img"><img src="' + bot_img + '" class="' + aditional_class + '"/></div>';
         content += '<div class="chat-content">';
         if (type_source == 'text') {
@@ -115,7 +117,13 @@ function append_msg(msg, sender, type_source, list) {
     }
 
     $('#card_chat').html('');
-    $('#card_chat').append(content_prev + content);
+
+    if (msg == 'Cuestionario2') {
+        $('#card_chat').append(content_prev);
+        content = '';
+    } else {
+        $('#card_chat').append(content_prev + content);
+    }
 
     guardar_flujo(type_source, sender, type_source == 'image' ? '---' : (list == '' ? msg : list), content);
 
@@ -124,7 +132,7 @@ function append_msg(msg, sender, type_source, list) {
         if (msg == 'En este momento procedo a llamar al Call Center') {
             alerta('Se procederá a llamar al Call Center', 'info');
             setTimeout(function () {
-                alerta('Luego por favor calificar la encuesta', 'info');    
+                alerta('Luego por favor calificar la encuesta', 'info');
             }, 2500);
             setTimeout(function () {
                 callNumber(call_center_invitado);
@@ -157,23 +165,91 @@ function mostrar_encuesta() {
 }
 
 function guardar_flujo(tipo, remitente, contenido_texto, contenido_html) {
-    $.ajax({
-        type: "POST",
-        url: path + "/Flujo/registrar_flujo",
-        accept: 'application/json',
-        data: {
-            'id_flujo': 0,
-            'id_usuario': id_usuario,
-            'tipo': tipo,
-            'remitente': remitente,
-            'contenido_texto': contenido_texto,
-            'contenido_html': contenido_html.toString(),
-            'habilitado': 1
-        },
-        success: function (response) {
-            console.log(response);
+    if (contenido_html != '') {
+        $.ajax({
+            type: "POST",
+            url: path + "/Flujo/registrar_flujo",
+            accept: 'application/json',
+            data: {
+                'id_flujo': 0,
+                'id_usuario': id_usuario,
+                'tipo': tipo,
+                'remitente': remitente,
+                'contenido_texto': contenido_texto,
+                'contenido_html': contenido_html.toString(),
+                'habilitado': 1
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            complete: function () {
+                //validar_preguntas_cuestionario();
+            }
+        });
+    }
+
+}
+
+function validar_preguntas_cuestionario() {
+    var content = $('.chat-list').html();
+    var ultCont = $('.chat-list').find('li').last().html();
+
+    // PASA - NO PASA
+    var pasa = "inverse\">Pasa<"; //"redirect_message('T2SB1pregunta1','Pasa')";
+    var noPasa = "inverse\">No Pasa<"; //"redirect_message('T2SB2pregunta1','No Pasa')";
+
+    // IZQUIERDA
+    var si1I = "redirect_message('T2SB1pregunta2','Si')";
+    var no1I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si2I = "redirect_message('T2SB1pregunta3','Si')";
+    var no2I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si3I = "redirect_message('T2SB1pregunta4','Si')";
+    var no3I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si4I = "redirect_message('T2SB1Final','Si')"; // termina
+    var no4I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+
+    // DERECHA
+    var si1D = "redirect_message('T2SB2pregunta2','Si')";
+    var no1D = "redirect_message('T2SB2pregunta2','No')";
+
+    var si2D = "redirect_message('T2SB2pregunta3','Si')";
+    var no2D = "redirect_message('T2SB2pregunta3','No')";
+
+    var si3D = "redirect_message('T2SB2Final','Si')"; // si NO PASA termina
+    var no3D = "redirect_message('T2SB2Final','No')"; // si PASA sgte PreguntaIzquierda o termina
+
+    if (!content.includes(pasa) && content.includes(noPasa) && content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
+        if (!ultCont.includes(si3D)) {
+            //alert('termina');
         }
-    });
+    }
+    //revisar porque se duplica
+    else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && !content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si1I)) {
+            //alert('pasa al 2');
+        }
+    } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si2I)) {
+            //alert('pasa al 3');
+        }
+    } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si3I)) {
+            //alert('pasa al 4');
+        }
+    } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && content.includes(si4I)) {
+        if (!ultCont.includes(si4I)) {
+            //alert('termina');
+        }
+
+    } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && !content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si4I)) {
+            //alert('termina');
+        }
+    }
 }
 
 function validar_flujo_existente() {
@@ -251,15 +327,151 @@ $("#txtMessage").on('keyup', function (e) {
     }
 });
 
+var listaTextos = [
+    // cuestionario 1
+    'Cuestionario1'   //16-30 meses
+    , 'TPregunta1'       //empezar
+    , 'Tpregunta2'        //pregunta 1
+    , 'Tpregunta3'        //pregunta 2
+    , 'Tpregunta4'        //pregunta 3
+    , 'Tpregunta5'        //pregunta 4
+    , 'Tpregunta6'        //pregunta 5
+    , 'Tpregunta7'        //pregunta 6
+    , 'Tpregunta8'        //pregunta 7
+    , 'Tpregunta9'        //pregunta 8
+    , 'Tpregunta10'        //pregunta 9
+    , 'Tpregunta11'        //pregunta 10
+    , 'Tpregunta12'        //pregunta 11
+    , 'Tpregunta13'        //pregunta 12
+    , 'Tpregunta14'        //pregunta 13
+    , 'Tpregunta15'        //pregunta 14
+    , 'Tpregunta16'        //pregunta 15
+    , 'Tpregunta17'        //pregunta 16
+    , 'Tpregunta18'        //pregunta 17
+    , 'Tpregunta19'        //pregunta 18
+    , 'Tpregunta20'        //pregunta 19
+    , 'TpreguntaFinal'        //pregunta 20
+
+    // cuestionario 2
+    , 'Cuestionario2'
+    , 'T2pregunta1'         //empezar
+
+    /*izquierda (si marca NO solo debe ir una vez a la derecha - si marca todo SI termina) */
+    , 'T2SB1pregunta1'
+    , 'T2SB1pregunta2'
+    , 'T2SB1pregunta3'
+    , 'T2SB1pregunta4'
+    , 'T2SB1Final' //---->termina todo el flujo
+    /*derecha (despues de responder las 3 regresar a la preguta sgte(si hay) si no termina)*/
+    , 'T2SB2pregunta1'
+    , 'T2SB2pregunta2'
+    , 'T2SB2pregunta3'
+    , 'T2SB2Final' //---->T2SB1pregunta#
+
+];
+
+//texto == 'SiEnchufado' || texto == 'Luz' || texto == 'LaptoRouter' || texto == 'Confirm' || texto == 'NoCable' || texto == 'SiCable' || texto == 'Nointernet' || texto == 'Siinternet' || texto == 'si_otra_consulta' || texto == 'ninguna_consulta'
 function redirect_message(texto, label) {
 
-    if (texto == 'SiEnchufado' || texto == 'Luz' || texto == 'LaptoRouter' || texto == 'Confirm' || texto == 'NoCable' || texto == 'SiCable' || texto == 'Nointernet' || texto == 'Siinternet' || texto == 'si_otra_consulta' || texto == 'ninguna_consulta') {
+    var content = $('.chat-list').html();
+    var ultCont = $('.chat-list').find('li').last().html();
+
+    // PASA - NO PASA
+    var pasa = "inverse\">Pasa<"; //"redirect_message('T2SB1pregunta1','Pasa')";
+    var noPasa = "inverse\">No Pasa<"; //"redirect_message('T2SB2pregunta1','No Pasa')";
+
+    // IZQUIERDA
+    var si1I = "redirect_message('T2SB1pregunta2','Si')";
+    var no1I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si2I = "redirect_message('T2SB1pregunta3','Si')";
+    var no2I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si3I = "redirect_message('T2SB1pregunta4','Si')";
+    var no3I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    var si4I = "redirect_message('T2SB1Final','Si')"; // termina
+    var no4I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
+
+    // DERECHA
+    var si1D = "redirect_message('T2SB2pregunta2','Si')";
+    var no1D = "redirect_message('T2SB2pregunta2','No')";
+
+    var si2D = "redirect_message('T2SB2pregunta3','Si')";
+    var no2D = "redirect_message('T2SB2pregunta3','No')";
+
+    var si3D = "redirect_message('T2SB2Final','Si')"; // si NO PASA termina
+    var no3D = "redirect_message('T2SB2Final','No')"; // si PASA sgte PreguntaIzquierda o termina
+
+    //validar al terminar preguntas-derecha
+    if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+        content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && !content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si1I)) {
+            //alert('pasa al 2');
+            redirect_message('T2SB1pregunta2', label);
+            return;
+        }
+    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+        content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si2I)) {
+            //alert('pasa al 3');
+            redirect_message('T2SB1pregunta3', label);
+            return;
+        }
+    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+        content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && !content.includes(si4I)) {
+        if (!ultCont.includes(si3I)) {
+            //alert('pasa al 4');
+            redirect_message('T2SB1pregunta4', label);
+            return;
+        }
+    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+        content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && content.includes(si4I)) {
+        if (!ultCont.includes(si4I)) {
+            //alert('termina');
+            redirect_message('T2SB1Final', label);
+            return;
+        }
+    }
+
+    else if (texto == 'T2SB2pregunta1' && label == 'No') { //cualquier NO de la izquierda
+        if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && !content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) { //pregunta 1
+            if (content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
+                //alert('pasa a 2');
+                redirect_message('T2SB1pregunta2', label);
+                return;
+            }
+        } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) { //pregunta 2
+            if (content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
+                //alert('pasa a 3');
+                redirect_message('T2SB1pregunta3', label);
+                return;
+            }
+        } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && !content.includes(si4I)) { //pregunta 3
+            if (content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
+                //alert('pasa a 4');
+                redirect_message('T2SB1pregunta4', label);
+                return;
+            }
+        } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && content.includes(si4I)) { //pregunta 4
+            if (content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
+                //alert('termina');
+                redirect_message('T2SB1Final', label);
+                return;
+            }
+        }
+    }
+
+    if (listaTextos.includes(texto)) {
+
         _label = texto;
         texto = label;
+    } else {
+        _label = label;
+        texto = texto;
     }
 
     $('#txtMessage').val(texto);
-
     enviar_consulta();
 }
 
@@ -280,25 +492,6 @@ $('#div_speak').on('click', function () {
     procesar();
 });
 
-$('#div_close_session').on('click', function () {
-    $.ajax({
-        type: "POST",
-        url: path + "/Home/inactivar_sesion",
-        accept: 'application/json',
-        beforeSend: function () {
-
-        },
-        success: function (data) {
-            if (data == 'OK') {
-                console.log('sesion cerrada');
-                window.location.href = path + '/Login';
-            } else {
-                console.log(data);
-            }
-        }
-    });
-});
-
 function enviar_consulta() {
     var msg = $('#txtMessage').val().trim();
 
@@ -315,7 +508,9 @@ function enviar_consulta() {
     if (msg.indexOf('documento') !== -1 && id_tipousuario == 2) {
         $('#txtMessage').val('');
         show_previews_dots();
+
         append_msg(msg, 'person', 'text', '');
+
         $('.dots_container_').parent().remove();
         //append_msg('Selecciona tu tipo de documento', 'bot', 'text', '');
         //return;
@@ -525,7 +720,7 @@ function enviar_consulta() {
                 _label == '';
             },
             success: function (response) {
-                console.log('RESPONSE CHAT: ' +  response);
+                //console.log('RESPONSE CHAT: ' +  response);
 
                 $('.dots_container_').parent().remove();
 
@@ -553,6 +748,25 @@ function enviar_consulta() {
         });
     }
 }
+
+$('#div_close_session').on('click', function () {
+    $.ajax({
+        type: "POST",
+        url: path + "/Home/inactivar_sesion",
+        accept: 'application/json',
+        beforeSend: function () {
+
+        },
+        success: function (data) {
+            if (data == 'OK') {
+                console.log('sesion cerrada');
+                window.location.href = path + '/Login';
+            } else {
+                console.log(data);
+            }
+        }
+    });
+});
 
 function show_previews_dots() {
     var content = $('#card_chat').html();
@@ -590,20 +804,20 @@ function get_generic_elements(obj_generic) {
                 text_type_obj(obj_generic[i], res_type);
             }
             else
-            if (res_type == 'pause') {
-                pause_type_obj(obj_generic[i], res_type);
-            }
-            else
-            if (res_type == 'image') {
-                image_type_obj(obj_generic[i], res_type);
-            }
-            else
-            if (res_type == 'option') {
-                option_type_obj(obj_generic[i], res_type);
-            }
-            else {
-                append_msg('El servicio de Chatbot no responde. Vuelva a intentarlo', 'bot', 'text', '');
-            }
+                if (res_type == 'pause') {
+                    pause_type_obj(obj_generic[i], res_type);
+                }
+                else
+                    if (res_type == 'image') {
+                        image_type_obj(obj_generic[i], res_type);
+                    }
+                    else
+                        if (res_type == 'option') {
+                            option_type_obj(obj_generic[i], res_type);
+                        }
+                        else {
+                            append_msg('El servicio de Chatbot no responde. Vuelva a intentarlo', 'bot', 'text', '');
+                        }
         }
     }
 }
@@ -611,20 +825,32 @@ function get_generic_elements(obj_generic) {
 function text_type_obj(obj_text, type) {
     var text = obj_text.text;
 
-    if (text == 'Se enviara un técnico a su domicilio para revisar el equipo\n' || text == 'Se enviará un técnico a su domicilio para revisar el equipo\n' ||
-        text == 'Se enviara un técnico a su zona para revisar las conexiones\n\n' || text == 'Se enviará un técnico a su zona para revisar las conexiones\n\n') {
+    var listaRptas = [
+        //terminó test 1
+        'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo'
+        , 'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo\n\n'
+    ];
+
+    if (listaRptas.includes(text)) {
 
         $.ajax({
             type: "POST",
             url: path + '/Ticket/registrar_ticket',
             accept: 'application/json',
-            data: { 'id_ticket': 0, 'codigo': '', 'id_usuario': id_usuario, 'estado': 'PENDIENTE' },
+            data: { 'id_ticket': 0, 'codigo': '', 'id_usuario': id_usuario, 'estado': text },
             success: function (response) {
                 console.log(response);
-                if (response.codigo != 'ERROR') {
-                    text = text.split('\n').join('') + '.<br/>Su ticket de seguimiento es: <b>' + response.codigo + '</b>';
+
+                if (response.estado) {
+                    if (response.descripcion == 'OK') {
+                        append_msg(text, 'bot', type, '');
+                    } else {
+                        append_msg(response.descripcion, 'bot', type, '');
+                    }
+                    //text = text.split('\n').join('') + '.<br/>Su ticket de seguimiento es: <b>' + response.codigo + '</b>';
+                } else {
+                    append_msg(text, 'bot', type, '');
                 }
-                append_msg(text, 'bot', type, '');
             }
         });
     } else {
@@ -694,7 +920,7 @@ function listar_recibos() {
         type: "GET",
         url: path + '/Home/listar_archivos',
         accept: 'application/json',
-        beforeSend: function(){
+        beforeSend: function () {
             $('#preloader').removeAttr('style');
             $('#preloader').removeClass('hide-element');
         },
@@ -723,10 +949,10 @@ function listar_recibos() {
                 _html += '</table>';
             }
 
-            $('#div_lista_archivos').html('').append(_html);            
+            $('#div_lista_archivos').html('').append(_html);
             $('#mdl_archivos').modal('show');
             $('#preloader').addClass('hide-element');
-            append_msg('Recibos cargados correctamente','bot', 'text', '');
+            append_msg('Recibos cargados correctamente', 'bot', 'text', '');
         }
     });
 }

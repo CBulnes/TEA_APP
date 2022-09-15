@@ -18,25 +18,35 @@ namespace Tea.site.Controllers
         dynamic obj = new System.Dynamic.ExpandoObject();
 
         [HttpPost]
-        public ActionResult<Ticket> registrar_ticket(Ticket oTicket)
+        public ActionResult<RespuestaUsuario> registrar_ticket(Ticket oTicket)
         {
             string rpta = "";
+            RespuestaUsuario respuesta = new RespuestaUsuario();
             try
             {
-                oTicket.codigo = generar_ticket();
+                Cita ocita = new Cita();
+                ocita.id_usuario = oTicket.id_usuario;
+                ocita.fecha_cita = "";
+                if (oTicket.estado == "Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo")
+                {
+                    ocita.id_doctor_asignado = 2; //cuestionario 2
+                }
 
-                url = url_usuario + "/registrar_ticket";
+                url = Helper.GetUrlApi() + "/api/cita/registrar_cuestionario";
 
-                obj = (dynamic)oTicket;
+                obj = (dynamic)ocita;
 
                 rpta = ApiCaller.consume_endpoint_method(url, obj, "POST");
+                respuesta = JsonConvert.DeserializeObject<RespuestaUsuario>(rpta);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                oTicket.codigo = "ERROR";
+                //oTicket.codigo = "ERROR";
+                respuesta.estado = false;
+                respuesta.descripcion = "Ocurrió un error al procesar su solicitud, vuelva a intentarlo";
             }
-            return oTicket;
+            return respuesta;
         }
 
         public string generar_ticket()

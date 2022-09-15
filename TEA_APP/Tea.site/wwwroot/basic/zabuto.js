@@ -848,12 +848,19 @@ function contenido_cita(dia, mes, año) {
             if (dia_nombre == 'sábado' || dia_nombre == 'domingo') {
                 html = '-';
             } else {
-                var clase_estado = item.estado == 'REGISTRADO' ? 'div_cita_registrada' : 'div_cita_atendida';
+                if (item.tipo == 'CITA') {
+                    var clase_estado = item.estado == 'REGISTRADO' ? 'div_cita_registrada' : 'div_cita_atendida';
 
-                html += '<div class="div_cita ' + clase_estado + '" data-id-cita="' + item.id_cita + '" data-id-especialista="' + item.id_doctor_asignado + '" data-fecha-cita="' + item.fecha_cita + '" data-hora-cita="' + item.hora_cita + '" data-estado="' + item.estado + '" onclick="ver_cita(this)">';
-                html += 'Especialista: ' + item.doctor_asignado + '<br/>';
-                html += 'Hora: ' + item.hora_cita;
-                html += '</div > ';
+                    html += '<div class="div_cita ' + clase_estado + '" data-id-cita="' + item.id_cita + '" data-id-especialista="' + item.id_doctor_asignado + '" data-fecha-cita="' + item.fecha_cita + '" data-hora-cita="' + item.hora_cita + '" data-estado="' + item.estado + '" onclick="ver_cita(this)">';
+                    html += 'Especialista: ' + item.doctor_asignado + '<br/>';
+                    html += 'Hora: ' + item.hora_cita;
+                    html += '</div > ';
+                }
+                if (item.tipo == 'CUESTIONARIO') {
+                    html += '<div class="div_cita" style="background-color: #6fd530; text-align: center;" data-id-cita="' + item.id_cita + '" data-id-cuestionario="' + item.id_doctor_asignado + '" data-estado="' + item.estado + '" onclick="ver_cuestionario(this)">';
+                    html += 'Cuestionario #' + item.id_doctor_asignado + '<br/>';
+                    html += '</div > ';
+                }
             }
         }
     }

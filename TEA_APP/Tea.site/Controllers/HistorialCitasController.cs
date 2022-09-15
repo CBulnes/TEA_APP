@@ -16,6 +16,7 @@ namespace Tea.site.Controllers
         private string url_citas_doctor = Helper.GetUrlApi() + "/api/cita/citas_doctor";
         private string url_historial_usuario = Helper.GetUrlApi() + "/api/cita/historial_usuario";
         private string url_registrar_historial = Helper.GetUrlApi() + "/api/cita/registrar_historial";
+        private string url_registrar_estado_cuestionario = Helper.GetUrlApi() + "/api/cita/registrar_estado_cuestionario";
 
         private string url = "";
         dynamic obj = new System.Dynamic.ExpandoObject();
@@ -110,6 +111,27 @@ namespace Tea.site.Controllers
             {
                 res_.estado = false;
                 res_.descripcion = "Ocurrió un error al registrar la cita.";
+            }
+            return res_;
+        }
+
+        [HttpPost]
+        public async Task<RespuestaUsuario> RegistrarEstadoCuestionario(HistorialPaciente model)
+        {
+            model.id_doctor = Convert.ToInt32(HttpContext.Session.GetInt32("id_usuario"));
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            string res = "";
+            try
+            {
+                url = url_registrar_estado_cuestionario;
+                obj = (dynamic)model;
+                res = ApiCaller.consume_endpoint_method(url, obj, "POST");
+                res_ = JsonConvert.DeserializeObject<RespuestaUsuario>(res);
+            }
+            catch (Exception)
+            {
+                res_.estado = false;
+                res_.descripcion = "Ocurrió un error atendiendo su solicitud.";
             }
             return res_;
         }

@@ -29,6 +29,20 @@ namespace Tea.BL
             }
             return res_;
         }
+        public RespuestaUsuario registrar_cuestionario(Cita oCita, string main_path, string random_str)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            try
+            {
+                res_ = citaDA.registrar_cuestionario(oCita, main_path, random_str);
+            }
+            catch (Exception)
+            {
+                res_.estado = false;
+                res_.descripcion = "Ocurrió un error al registrar la cita.";
+            }
+            return res_;
+        }
 
         public List<Cita> disponibilidad_doctor(int id_doctor, string fecha, string main_path, string random_str)
         {

@@ -49,6 +49,35 @@ namespace Tea.DA
             return res_;
         }
 
+        public RespuestaUsuario registrar_estado_cuestionario(HistorialPaciente oHistorial)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand("SP_REGISTRAR_ESTADO_CUESTIONARIO", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@id_cita", SqlDbType.Int).Value = oHistorial.id_cita;
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    res_.descripcion = Convert.ToString(row["rpta"]);
+                }
+                res_.estado = res_.descripcion == "OK" ? true : false;
+            }
+            catch (Exception e)
+            {
+                res_.estado = false;
+                res_.descripcion = "Ocurrió un error atendiendo su solicitud.";
+            }
+            cn.Close();
+            return res_;
+        }
+
         public List<HistorialPaciente> listar_historial(int id_usuario)
         {
             List<HistorialPaciente> lista = new List<HistorialPaciente>();

@@ -51,6 +51,24 @@ namespace Tea.api.Controllers
             return res_;
         }
 
+        [HttpPost("registrar_cuestionario")]
+        public RespuestaUsuario Post2([FromBody] Cita oCita)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            random_str = ru.RandomString(8) + "|" + ru.CurrentDate();
+
+            try
+            {
+                res_ = citaBL.registrar_cuestionario(oCita, main_path, random_str);
+            }
+            catch (Exception)
+            {
+                res_.descripcion = "Ocurrió un error al registrar la cita";
+                res_.estado = false;
+            }
+            return res_;
+        }
+
         [HttpGet("disponibilidad_doctor/{id_doctor}/{fecha}")]
         public List<Cita> disponibilidad_doctor(int id_doctor, string fecha)
         {
@@ -128,6 +146,24 @@ namespace Tea.api.Controllers
             catch (Exception)
             {
                 res_.descripcion = "Ocurrió un error al registrar la información.";
+                res_.estado = false;
+            }
+            return res_;
+        }
+
+        [HttpPost("registrar_estado_cuestionario")]
+        public RespuestaUsuario RegistrarEstadoCuestionario([FromBody] HistorialPaciente oHistorial)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            random_str = ru.RandomString(8) + "|" + ru.CurrentDate();
+
+            try
+            {
+                res_ = historialBL.registrar_estado_cuestionario(oHistorial);
+            }
+            catch (Exception)
+            {
+                res_.descripcion = "Ocurrió un error atendiendo su solicitud.";
                 res_.estado = false;
             }
             return res_;

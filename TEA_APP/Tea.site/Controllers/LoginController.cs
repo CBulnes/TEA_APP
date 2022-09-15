@@ -51,6 +51,7 @@ namespace Tea.site.Controllers
                     HttpContext.Session.SetString("tipousuario", usuario.tipousuario.ToUpper());
                     HttpContext.Session.SetString("tipo_documento", usuario.tipo_documento);
                     HttpContext.Session.SetString("num_documento", usuario.num_documento);
+                    HttpContext.Session.SetInt32("test_actual", usuario.test_actual);
                     HttpContext.Session.SetInt32("flag_chat", 1);
                 }
             }

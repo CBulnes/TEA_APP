@@ -49,6 +49,40 @@ namespace Tea.DA
             return res_;
         }
 
+        public RespuestaUsuario registrar_cuestionario(Cita oCita, string main_path, string random_str)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand("SP_REGISTRAR_CUESTIONARIO", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //cmd.Parameters.Add("@id_cita", SqlDbType.Int).Value = oCita.id_cita;
+                cmd.Parameters.Add("@id_usuario", SqlDbType.Int).Value = oCita.id_usuario;
+                cmd.Parameters.Add("@fecha_cita", SqlDbType.VarChar).Value = oCita.fecha_cita;
+                //cmd.Parameters.Add("@hora_cita", SqlDbType.VarChar).Value = oCita.hora_cita;
+                cmd.Parameters.Add("@id_doctor", SqlDbType.Int).Value = oCita.id_doctor_asignado;
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    res_.descripcion = Convert.ToString(row["rpta"]);
+                }
+                res_.estado = (res_.descripcion == "OK" || res_.descripcion == "Gracias por participar en la encuesta") ? true : false;
+            }
+            catch (Exception e)
+            {
+                //LOG.registrarLog("(Excepcion " + random_str + ")[ERROR]->[CitaDA.cs / registrar_cita <> " + e.Message.ToString(), "ERROR", main_path);
+                res_.estado = false;
+                res_.descripcion = "Ocurrió un error al registrar el cuestionario.";
+            }
+            cn.Close();
+            return res_;
+        }
+
         public List<Cita> disponibilidad_doctor(int id_doctor, string fecha, string main_path, string random_str)
         {
             List<Cita> lista = new List<Cita>();
@@ -105,6 +139,7 @@ namespace Tea.DA
                     cita.hora_cita = Convert.ToString(row["hora_cita"]);
                     cita.id_doctor_asignado = Convert.ToInt32(row["id_doctor_asignado"]);
                     cita.doctor_asignado = Convert.ToString(row["doctor_asignado"]);
+                    cita.tipo = Convert.ToString(row["tipo"]);
                     lista.Add(cita);
                 }
             }
@@ -143,6 +178,7 @@ namespace Tea.DA
                     cita.hora_cita = Convert.ToString(row["hora_cita"]);
                     cita.id_usuario = Convert.ToInt32(row["id_usuario"]);
                     cita.usuario = Convert.ToString(row["usuario"]);
+                    cita.tipo = Convert.ToString(row["tipo"]);
                     lista.Add(cita);
                 }
             }

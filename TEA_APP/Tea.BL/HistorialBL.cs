@@ -29,6 +29,20 @@ namespace Tea.BL
             }
             return res_;
         }
+        public RespuestaUsuario registrar_estado_cuestionario(HistorialPaciente oHistorial)
+        {
+            RespuestaUsuario res_ = new RespuestaUsuario();
+            try
+            {
+                res_ = historialDA.registrar_estado_cuestionario(oHistorial);
+            }
+            catch (Exception)
+            {
+                res_.estado = false;
+                res_.descripcion = "Ocurrió un error atendiendo su solicitud.";
+            }
+            return res_;
+        }
 
         public List<HistorialPaciente> listar_historial(int id_usuario)
         {

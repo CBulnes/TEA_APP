@@ -4,6 +4,8 @@ var lista_citas = [];
 var id_cita_ = 0;
 var estado_ = '';
 
+var person_img = path + '/images/user.png';
+
 function cargar_citas() {
     $.ajax({
         url: '/RegistroCitas/CitasUsuario',
@@ -50,6 +52,62 @@ function ver_cita(e) {
     var fecha_cita = $(e).attr('data-fecha-cita');
 
     cargar_datos_cita(id_cita, id_especialista, fecha_cita, hora_Cita, estado);
+}
+
+function ver_cuestionario(e) {
+    var cuestionario = $(e).attr('data-id-cuestionario');
+    var idCita = $(e).attr('data-id-cita');
+    var estado = $(e).attr('data-estado');
+
+    if (cuestionario == 2) {
+
+        if (estado == 'ATENDIDO') {
+            alert('El cuestionario seleccionado ya se ha aperturado');
+            return;
+        }
+
+        var data_ = {
+            id_historial: 0,
+            id_paciente: 0,
+            nota: '',
+            recomendacion: '',
+            medicina: '',
+            id_doctor: 0,
+            doctor: '',
+            fecha_registro: '',
+            hora_registro: '',
+            id_cita: idCita
+        };
+
+        $.ajax({
+            url: "/HistorialCitas/RegistrarEstadoCuestionario",
+            type: "POST",
+            data: data_,
+            success: function (data) {
+                if (data.estado) {
+                    cuestionario = 'Cuestionario2';
+
+                    $(e).attr('data-estado', 'ATENDIDO');
+
+                    $('#txtMessage').val(cuestionario);
+                    enviar_consulta();
+
+                    $('#ChatButton').trigger('click');
+                } else {
+                    /*alertWarning("Atención", data.message);*/
+                    alert(data.descripcion);
+                    //$("#load_data").hide();
+                }
+            },
+            error: function (response) {
+                /*alertWarning("Atención", "Ocurrió un error al guardar la cita.");*/
+                alert("Ocurrió un error atendiendo su solicitud.");
+                //$("#load_data").hide();
+            },
+            complete: function () {
+            }
+        });
+    }
 }
 
 function cargar_datos_cita(id_cita, id_doctor, fecha, hora, estado) {

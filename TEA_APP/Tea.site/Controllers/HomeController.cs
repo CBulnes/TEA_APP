@@ -94,6 +94,19 @@ namespace Tea.site.Controllers
             dynamic obj_response = new System.Dynamic.ExpandoObject();
             string msg = input.message;
 
+            if (msg == "hola")
+            {
+                //validar si tiene test asignado
+            }
+            if (msg == "Cuestionario 1")
+            {
+                //quiere iniciar test 1 (aun no confirmado)
+            }
+            if (msg == "Tpregunta1")
+            {
+                //confirma inicio test 1
+            }
+
             if (!string.IsNullOrEmpty(HttpContext.Session.GetString("nombres") as string))
             {
                 try
