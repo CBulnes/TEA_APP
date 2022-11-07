@@ -116,7 +116,7 @@ function pie_nps(data_nps) {
     var data_nps_dona = [];
     var i = 0;
     for (var item of data_nps) {
-        if (item.resultado == 'Pasivo' || item.resultado == 'Promotor' || item.resultado == 'Detractor') {
+        if (item.resultado == 'Nulo' || item.resultado == 'Promotor' || item.resultado == 'Detractor') {
             i++;
             var item_ = {
                 label: item.resultado,
@@ -202,7 +202,7 @@ function resultados_nps(data_nps) {
         }
     }
     for (var item of data_nps) {
-        if (item.resultado == 'Pasivo') {
+        if (item.resultado == 'Nulo') {
             _html += '<tr><td>' + item.resultado + '</td><td>' + item.total_porcentaje + '%' + '</td></tr>';
         }
     }
@@ -239,6 +239,7 @@ function resultados_nps(data_nps) {
 }
 
 function resultados_flujo(data_nps) {
+    return;
     var _html = '';
     _html += '<table class="tablesaw table-striped table-hover table-bordered table tablesaw-columntoggle">';
     _html += '<thead><tr><th colspan="3">FLUJOS GENERAL</th></tr></thead>';

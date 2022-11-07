@@ -47,8 +47,9 @@ $('#cboAño').on('change', function () {
 })
 
 function funciones_graficos(año) {
-    cargar_data_graficos(año, 'visitas', 'visitas');
-    cargar_data_graficos(año, 'puntos_visitados', 'puntos-visitados');
+    cargar_data_graficos(año, 'encuestas', 'encuestas');
+    /*cargar_data_graficos(año, 'visitas', 'visitas');*/
+    //cargar_data_graficos(año, 'puntos_visitados', 'puntos-visitados');
 
     $('.preloader').addClass('hide-element');
 }

@@ -62,7 +62,7 @@ function ver_cuestionario(e) {
     if (cuestionario == 2) {
 
         if (estado == 'ATENDIDO') {
-            alert('El cuestionario seleccionado ya se ha aperturado');
+            alerta('El cuestionario seleccionado ya se ha aperturado', 'info');
             return;
         }
 
@@ -95,13 +95,13 @@ function ver_cuestionario(e) {
                     $('#ChatButton').trigger('click');
                 } else {
                     /*alertWarning("Atención", data.message);*/
-                    alert(data.descripcion);
+                    alerta(data.descripcion, 'info');
                     //$("#load_data").hide();
                 }
             },
             error: function (response) {
                 /*alertWarning("Atención", "Ocurrió un error al guardar la cita.");*/
-                alert("Ocurrió un error atendiendo su solicitud.");
+                alerta("Ocurrió un error atendiendo su solicitud.", 'info');
                 //$("#load_data").hide();
             },
             complete: function () {
@@ -175,13 +175,13 @@ function guardar_cita() {
 
     if (hora == '') {
         /*alertSecondary("Mensaje", "Seleccione la hora para el registro de la cita.");*/
-        alert("Seleccione la hora para el registro de la cita.");
+        alerta("Seleccione la hora para el registro de la cita.", 'info');
         return;
     }
 
     if (doctor == '-1') {
         /*alertSecondary("Mensaje", "Seleccione el especialista.");*/
-        alert("Seleccione el especialista.");
+        alerta("Seleccione el especialista.", 'info');
         return;
     }
 
@@ -202,7 +202,7 @@ function guardar_cita() {
             console.log(data);
             if (data.estado) {
                 /*alertSuccess("Muy bien", "Cita guardada exitosamente.");*/
-                alert("Cita guardada exitosamente.");
+                alerta("Cita guardada exitosamente.", 'info');
                 //$("#load_data").hide();
                 //recargarInstruccion();
                 $('#txtHora').val('');
@@ -213,13 +213,13 @@ function guardar_cita() {
                 cargar_citas();
             } else {
                 /*alertWarning("Atención", data.message);*/
-                alert(data.descripcion);
+                alerta(data.descripcion, 'info');
                 //$("#load_data").hide();
             }
         },
         error: function (response) {
             /*alertWarning("Atención", "Ocurrió un error al guardar la cita.");*/
-            alert("Ocurrió un error al guardar la cita.");
+            alerta("Ocurrió un error al guardar la cita.", 'info');
             //$("#load_data").hide();
         },
         complete: function () {
@@ -232,7 +232,7 @@ function validateHhMm(e) {
 
     if (isValid) {
     } else {
-        alert("El formato de hora ingresada es incorrecto.");
+        alerta("El formato de hora ingresada es incorrecto.", 'info');
     }
 }
 
@@ -336,7 +336,7 @@ function seleccionar_hora_disponible(e) {
     var hora = $(e).attr('data-hora');
 
     if (hora == '') {
-        alert("Ya hay una cita registrada en el horario seleccionado.");
+        alerta("Ya hay una cita registrada en el horario seleccionado.", 'info');
         $('#txtHora').val('');
         return;
     } else {

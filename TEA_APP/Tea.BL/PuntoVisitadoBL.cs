@@ -24,5 +24,10 @@ namespace Tea.BL
         {
             return puntoVisitadoDA.listar_visitas(año, mes, main_path, random_str);
         }
+
+        public List<PuntoVisitado> listar_encuestas(int año, int mes, string main_path, string random_str)
+        {
+            return puntoVisitadoDA.listar_encuestas(año, mes, main_path, random_str);
+        }
     }
 }

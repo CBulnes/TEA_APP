@@ -102,6 +102,7 @@ namespace Tea.DA
                     historial.doctor = Convert.ToString(row["doctor"]);
                     historial.fecha_registro = Convert.ToString(row["fecha_registro"]);
                     historial.hora_registro = Convert.ToString(row["hora_registro"]);
+                    historial.cuestionarios = Convert.ToString(row["cuestionarios"]);
                     lista.Add(historial);
                 }
             }

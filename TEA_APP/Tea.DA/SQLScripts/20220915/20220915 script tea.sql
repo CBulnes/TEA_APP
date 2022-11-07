@@ -1054,7 +1054,7 @@ BEGIN
 		select top 1 id_usuario,tipo,contenido_texto,contenido_html,1,remitente from tbl_flujos
 		where id_usuario = @id_usuario and habilitado = 0;
 
-			SELECT 'Gracias por participar en la encuesta' AS 'rpta';
+			SELECT 'Gracias por participar en el cuestionario' AS 'rpta';
 	end
 
 END
@@ -1124,7 +1124,7 @@ BEGIN
   end    
  end    
     
-  if @contenido_texto = 'Gracias por participar en la encuesta' or @contenido_texto = 'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo'  
+  if @contenido_texto = 'Gracias por participar en el cuestionario' or @contenido_texto = 'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo'  
  begin  
  insert into tbl_flujos (id_usuario, tipo, contenido_texto, contenido_html, habilitado, remitente)    
  values (@id_usuario, @tipo, @contenido_texto, @contenido_html, 0, @remitente);    

@@ -71,7 +71,7 @@ namespace Tea.DA
                 {
                     res_.descripcion = Convert.ToString(row["rpta"]);
                 }
-                res_.estado = (res_.descripcion == "OK" || res_.descripcion == "Gracias por participar en la encuesta") ? true : false;
+                res_.estado = (res_.descripcion == "OK" || res_.descripcion == "Gracias por participar en el cuestionario") ? true : false;
             }
             catch (Exception e)
             {

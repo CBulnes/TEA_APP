@@ -15,6 +15,7 @@ namespace Tea.entities
         public string doctor { get; set; } = "";
         public string fecha_registro { get; set; } = "";
         public string hora_registro { get; set; } = "";
+        public string cuestionarios { get; set; } = "";
         public int id_cita { get; set; } = 0;
     }
 }

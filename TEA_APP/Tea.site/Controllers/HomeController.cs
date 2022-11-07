@@ -225,6 +225,7 @@ namespace Tea.site.Controllers
                 if (tipo_usuario == "ADMIN" || tipo_usuario == "ADMINISTRADOR")
                 {
                     //menu.Add(new Menu { nombre_opcion = "Mantenimiento", ruta_opcion = "Mantenimiento" });
+                    menu.Add(new Menu { nombre_opcion = "Reportes", ruta_opcion = "Reportes" });
                 }
                 else if (tipo_usuario == "CLIENTE")
                 {
@@ -354,20 +355,30 @@ namespace Tea.site.Controllers
         }
 
         [HttpPost]
-        public ActionResult<string> registrar_puntuacion(Puntuacion oPuntuacion)
+        public ActionResult<RespuestaUsuario> registrar_puntuacion(Puntuacion oPuntuacion)
         {
-            string rpta = "";
+            string res = "";
+            RespuestaUsuario rpta = new RespuestaUsuario();
             try
             {
                 url = url_encuesta + "/registrar_puntuacion";
                 obj = (dynamic)oPuntuacion;
 
-                rpta = ApiCaller.consume_endpoint_method(url, obj, "POST");
+                res = ApiCaller.consume_endpoint_method(url, obj, "POST");
+
+                if (res == "OK")
+                {
+                    rpta.estado = true;
+                } else
+                {
+                    rpta.estado = false;
+                    rpta.descripcion = res;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                rpta = "Ocurrió un error registrando la encuesta";
+                rpta.estado = false;
+                rpta.descripcion = "Ocurrió un error registrando la encuesta";
             }
             return rpta;
         }

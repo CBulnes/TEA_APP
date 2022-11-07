@@ -49,6 +49,9 @@ namespace Tea.api.Controllers
                 } else if (tipo == "visitas")
                 {
                     lista = puntoVisitadoBL.listar_visitas(año, mes, main_path, random_str);
+                } else if (tipo == "encuestas")
+                {
+                    lista = puntoVisitadoBL.listar_encuestas(año, mes, main_path, random_str);
                 }
                 oRespuesta.data = lista;
 

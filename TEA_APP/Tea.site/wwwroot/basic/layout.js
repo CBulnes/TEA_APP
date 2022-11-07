@@ -76,7 +76,7 @@ function build_menu_admin() {
                     menu = menu + "</ul>";
                     menu = menu + "</li>";
                 }
-                alert('aaa');
+                //alert('aaa');
                 $('#sidebarnav').append(menu);
                 $('#sidebarnav').metisMenu();
             }
@@ -265,8 +265,8 @@ function registrar_puntuacion(puntuacion) {
         success: function (data) {
             $('.preloader').addClass('hide-element');
 
-            if (data.toString() != '"OK"') {
-                alerta(data, 'warning');
+            if (!data.estado) {
+                alerta(data.descripcion, 'warning');
                 return;
             } else {
                 validar_flujo_existente_();
@@ -304,6 +304,7 @@ function validar_flujo_existente_() {
                     }
                 }
             } else {
+                //alert('aaaa');
                 append_msg('Hola, ¿cómo puedo ayudarte?', 'bot', 'text', '');
             }
 
@@ -433,7 +434,7 @@ function validar_orden() {
     var orden = $('#cboOrden').val();
 
     if (orden == '-1') {
-        alert('Seleccione el orden de la imagen a cargar.');
+        alerta('Seleccione el orden de la imagen a cargar.', 'info');
         return;
     }
     $('#fuImagen').trigger('click')
@@ -456,7 +457,7 @@ $('.uploader').fileupload({
 
         if (uploadErrors.length > 0) {
             //alertWarning("Error", uploadErrors.join("\n"));
-            alert(uploadErrors.join("\n"));
+            alerta(uploadErrors.join("\n"), 'info');
             return;
         }
         data.submit();
@@ -465,7 +466,7 @@ $('.uploader').fileupload({
     done: function (e, data) {
         if (data.result.estado) {
             /*alertSuccess("Muy bien", "Archivo cargado correctamente.");*/
-            alert("Archivo cargado correctamente.");
+            alerta("Archivo cargado correctamente.", 'info');
             $('#cboOrden').val(-1);
 
             setTimeout(function () {
@@ -475,7 +476,7 @@ $('.uploader').fileupload({
             return;
         } else {
             /*alertWarning("Atención", data.result.message);*/
-            alert(data.result.descripcion);
+            alerta(data.result.descripcion, 'info');
             return;
         }
     }

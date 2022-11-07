@@ -27,10 +27,18 @@ namespace Tea.site.Controllers
                 Cita ocita = new Cita();
                 ocita.id_usuario = oTicket.id_usuario;
                 ocita.fecha_cita = "";
-                if (oTicket.estado == "Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo")
+                if (oTicket.estado == "Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo"
+                || oTicket.estado == "Muy bien se agendó un nuevo test de evaluación, a partir de mañana podrá realizarlo")
                 {
                     ocita.id_doctor_asignado = 2; //cuestionario 2
                 }
+
+                //if (oTicket.estado == "El test de evaluación ha concluido se generara una cita con su médico"
+                //|| oTicket.estado == "El test de evaluación ha concluido se generará una cita con su médico"
+                //)
+                //{
+                //    ocita.id_doctor_asignado = 2; //cuestionario 3
+                //}
 
                 url = Helper.GetUrlApi() + "/api/cita/registrar_cuestionario";
 

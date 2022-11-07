@@ -604,9 +604,7 @@
         {
             if (Model.vista == "HOME")
             {
-                <script src="~/assets/plugins/echarts/echarts-all.js"></script>
 
-                <script type="text/javascript" src="~/basic/visitas.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
             }
             else if (Model.vista == "REPORTE")
             {
@@ -619,6 +617,9 @@
                 <script src="~/assets/plugins/morrisjs/morris.js"></script>
 
                 <script type="text/javascript" src="~/basic/reporte.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
+
+                <script src="~/assets/plugins/echarts/echarts-all.js"></script>
+                <script type="text/javascript" src="~/basic/visitas.js?f=@dHoy.ToString("yyyyMMddhhmmss")"></script>
             }
         }
         else // 2 cliente - 0 invitado

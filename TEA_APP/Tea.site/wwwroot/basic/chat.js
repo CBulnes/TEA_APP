@@ -125,7 +125,9 @@ function append_msg(msg, sender, type_source, list) {
         $('#card_chat').append(content_prev + content);
     }
 
-    guardar_flujo(type_source, sender, type_source == 'image' ? '---' : (list == '' ? msg : list), content);
+    if (msg != 'A continuación se le redireccionará a una encuesta.') {
+        guardar_flujo(type_source, sender, type_source == 'image' ? '---' : (list == '' ? msg : list), content);
+    }
 
     if ((msg == 'Gracias! Por su preferencia' || msg.includes('ticket de seguimiento') || msg == 'En este momento procedo a llamar al Call Center') && sender == 'bot') {
 
@@ -208,7 +210,7 @@ function validar_preguntas_cuestionario() {
     var si3I = "redirect_message('T2SB1pregunta4','Si')";
     var no3I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
 
-    var si4I = "redirect_message('T2SB1Final','Si')"; // termina
+    var si4I = "redirect_message('T2pregunta2Final','Si')"; // termina (antes T2SB1Final)
     var no4I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
 
 
@@ -219,8 +221,8 @@ function validar_preguntas_cuestionario() {
     var si2D = "redirect_message('T2SB2pregunta3','Si')";
     var no2D = "redirect_message('T2SB2pregunta3','No')";
 
-    var si3D = "redirect_message('T2SB2Final','Si')"; // si NO PASA termina
-    var no3D = "redirect_message('T2SB2Final','No')"; // si PASA sgte PreguntaIzquierda o termina
+    var si3D = "redirect_message('T2pregunta2','Si')"; // si NO PASA termina
+    var no3D = "redirect_message('T2pregunta2','No')"; // si PASA sgte PreguntaIzquierda o termina
 
     if (!content.includes(pasa) && content.includes(noPasa) && content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
         if (!ultCont.includes(si3D)) {
@@ -272,39 +274,51 @@ function validar_flujo_existente() {
                     $('#card_chat').append(mensaje);
 
                     if (i == j) {
-                        if ((flujo.contenido_texto == 'Gracias! Por su preferencia' || flujo.contenido_texto.includes('ticket de seguimiento')) && flujo.remitente == 'bot') {
-                            mostrar_encuesta();
+                        //modificar aqui
+                        if ((flujo.contenido_texto == 'CUESTIONARIO*' || flujo.contenido_texto == 'CUESTIONARIO**' || flujo.contenido_texto == 'Gracias! Por su preferencia' || flujo.contenido_texto.includes('ticket de seguimiento')) && flujo.remitente == 'bot') {
+                            if (flujo.contenido_texto == 'CUESTIONARIO*') {
+                                //append_msg('Gracias por participar en el cuestionario.', 'bot', 'text', '');
+                                append_msg('A continuación se le redireccionará a una encuesta.', 'bot', 'text', '');
+                            } else if (flujo.contenido_texto == 'CUESTIONARIO**') {
+                                append_msg('A continuación se le redireccionará a una encuesta.', 'bot', 'text', '');
+                            }
+                            setTimeout(function () {
+                                mostrar_encuesta();
+                            }, 5000);
                         }
                     }
                 }
 
-                if (id_tipousuario == 0) {
-                    var html_img = '';
+                //if (id_tipousuario == 0) {
+                //    var html_img = '';
 
-                    html_img += '<li>';
-                    html_img += '<div class="chat-img"><img src="' + bot_img + '" class="invisible-element" /></div>';
-                    html_img += '<div class="chat-content" style="display: inline-grid;">';
-                    html_img += '<div class="box bg-success"><div class="row">';
+                //    html_img += '<li>';
+                //    html_img += '<div class="chat-img"><img src="' + bot_img + '" class="invisible-element" /></div>';
+                //    html_img += '<div class="chat-content" style="display: inline-grid;">';
+                //    html_img += '<div class="box bg-success"><div class="row">';
 
-                    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/planes.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Planes_vigentes\')" /></div>';
-                    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/portabilidad.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Portabilidad\')" /></div>';
-                    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/promociones.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Promociones\')" /></div>';
+                //    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/planes.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Planes_vigentes\')" /></div>';
+                //    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/portabilidad.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Portabilidad\')" /></div>';
+                //    html_img += '<div class="col-lg-4"><img class="img-responsive" src="' + path + '/images/promociones.jpg" style="border-radius: 7px; cursor: pointer;" onclick="cargar_documento(\'Promociones\')" /></div>';
 
-                    html_img += '</div></div>';
-                    html_img += '</div>';
-                    html_img += '</li>';
+                //    html_img += '</div></div>';
+                //    html_img += '</div>';
+                //    html_img += '</li>';
 
-                    $('#card_chat').append(html_img);
-                    scroll_chat();
-                }
+                //    $('#card_chat').append(html_img);
+                //    scroll_chat();
+                //}
             } else {
                 append_msg('Hola, ¿cómo puedo ayudarte?', 'bot', 'text', '');
+                //$('#mdl_chat').modal('hide');
+                //$('#mdl_encuesta').modal('hide');
+                //$('#mdl_saludo_chatbot').modal('hide');
             }
 
         }
     });
 }
-if (id_tipousuario == 2 || id_tipousuario == 0) { //cliente - invitado
+if (id_tipousuario == 2) { //cliente
     validar_flujo_existente();
 }
 
@@ -357,17 +371,74 @@ var listaTextos = [
     , 'T2pregunta1'         //empezar
 
     /*izquierda (si marca NO solo debe ir una vez a la derecha - si marca todo SI termina) */
-    , 'T2SB1pregunta1'
-    , 'T2SB1pregunta2'
+    , 'T2SB1pregunta1','T2SB1pregunta1_P2'
+    , 'T2SB1pregunta2','T2SB1pregunta2_P2'
     , 'T2SB1pregunta3'
     , 'T2SB1pregunta4'
     , 'T2SB1Final' //---->termina todo el flujo
-    /*derecha (despues de responder las 3 regresar a la preguta sgte(si hay) si no termina)*/
-    , 'T2SB2pregunta1'
-    , 'T2SB2pregunta2'
+    , 'T2pregunta2Final'
+    /*derecha (despues de responder las 3 regresar a la pregunta sgte(si hay) si no termina)*/
+    , 'T2SB2pregunta1','T2SB2pregunta1_P2'
+    , 'T2SB2pregunta2','T2SB2pregunta2_P2'
     , 'T2SB2pregunta3'
-    , 'T2SB2Final' //---->T2SB1pregunta#
 
+    , 'T2pregunta2', 'T2Pregunta2'
+    , 'T2pregunta3', 'T2Pregunta3'
+    , 'T2pregunta4', 'T2Pregunta4'
+
+    
+    //flujo 2
+    , 'T2SB1pregunta1_P3'
+    , 'T2SB1pregunta2_P3'
+    , 'T2SB1pregunta3_P3'
+
+    //flujo 3
+    , 'T2SB2pregunta1_P3', 
+    , 'T2SB2pregunta2_P3'
+    , 'T2SB2pregunta3_P3'
+    , 'T2SB2pregunta4_P3'
+    , 'T2SB2pregunta5_P3'
+    , 'T2SB2pregunta6_P3'
+    , 'T2SB2pregunta7_P3'
+    , 'T2SB2pregunta8_P3'
+    , 'T2SB2pregunta9_P3'
+    , 'T2SB2pregunta10_P3'
+    , 'T2SB2pregunta11_P3'
+
+    //flujo 4
+    , 'T2SB1pregunta1_P4'
+    , 'T2SB2pregunta1_P4'
+    , 'T2SB2pregunta2_P4'
+    , 'T2SB2pregunta3_P4'
+    , 'T2SB2pregunta4_P4'
+
+    , 'T2SB2Final'
+
+    //test3
+    , 'T3Pregunta1',
+    'T3Pregunta2',
+    'T3Pregunta3',
+    'T3Pregunta4',
+    'T3Pregunta5',
+    'T3Pregunta6',
+    'T3Pregunta7',
+    'T3Pregunta8',
+    'T3Pregunta9',
+    'T3Pregunta10',
+    'Cuestionario3',
+
+    //test4
+    ,'T4Pregunta1',
+    'T4Pregunta2',
+    'T4Pregunta3',
+    'T4Pregunta4',
+    'T4Pregunta5',
+    'T4Pregunta6',
+    'T4Pregunta7',
+    'T4Pregunta8',
+    'T4Pregunta9',
+    'T4Pregunta10',
+    'Cuestionario4',
 ];
 
 //texto == 'SiEnchufado' || texto == 'Luz' || texto == 'LaptoRouter' || texto == 'Confirm' || texto == 'NoCable' || texto == 'SiCable' || texto == 'Nointernet' || texto == 'Siinternet' || texto == 'si_otra_consulta' || texto == 'ninguna_consulta'
@@ -390,7 +461,7 @@ function redirect_message(texto, label) {
     var si3I = "redirect_message('T2SB1pregunta4','Si')";
     var no3I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
 
-    var si4I = "redirect_message('T2SB1Final','Si')"; // termina
+    var si4I = "redirect_message('T2pregunta2Final','Si')"; // termina (antes T2SB1Final)
     var no4I = "redirect_message('T2SB2pregunta1','No')"; // lleva a la derecha
 
     // DERECHA
@@ -400,36 +471,36 @@ function redirect_message(texto, label) {
     var si2D = "redirect_message('T2SB2pregunta3','Si')";
     var no2D = "redirect_message('T2SB2pregunta3','No')";
 
-    var si3D = "redirect_message('T2SB2Final','Si')"; // si NO PASA termina
-    var no3D = "redirect_message('T2SB2Final','No')"; // si PASA sgte PreguntaIzquierda o termina
+    var si3D = "redirect_message('T2pregunta2','Si')"; // si NO PASA termina
+    var no3D = "redirect_message('T2pregunta2','No')"; // si PASA sgte PreguntaIzquierda o termina
 
     //validar al terminar preguntas-derecha
-    if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+    if (((texto == 'T2pregunta2' && label == 'Si') || (texto == 'T2pregunta2' && label == 'No')) &&
         content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && !content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
         if (!ultCont.includes(si1I)) {
             //alert('pasa al 2');
             redirect_message('T2SB1pregunta2', label);
             return;
         }
-    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+    } else if (((texto == 'T2pregunta2' && label == 'Si') || (texto == 'T2pregunta2' && label == 'No')) &&
         content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && !content.includes(si3I) && !content.includes(si4I)) {
         if (!ultCont.includes(si2I)) {
             //alert('pasa al 3');
             redirect_message('T2SB1pregunta3', label);
             return;
         }
-    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+    } else if (((texto == 'T2pregunta2' && label == 'Si') || (texto == 'T2pregunta2' && label == 'No')) &&
         content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && !content.includes(si4I)) {
         if (!ultCont.includes(si3I)) {
             //alert('pasa al 4');
             redirect_message('T2SB1pregunta4', label);
             return;
         }
-    } else if (((texto == 'T2SB2Final' && label == 'Si') || (texto == 'T2SB2Final' && label == 'No')) &&
+    } else if (((texto == 'T2pregunta2' && label == 'Si') || (texto == 'T2pregunta2' && label == 'No')) &&
         content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && content.includes(si4I)) {
         if (!ultCont.includes(si4I)) {
             //alert('termina');
-            redirect_message('T2SB1Final', label);
+            redirect_message('T2pregunta2Final', label); //antes T2SB1Final
             return;
         }
     }
@@ -456,7 +527,7 @@ function redirect_message(texto, label) {
         } else if (content.includes(pasa) && !content.includes(noPasa) && content.includes(si1I) && content.includes(si2I) && content.includes(si3I) && content.includes(si4I)) { //pregunta 4
             if (content.includes(si1D) && content.includes(si2D) && content.includes(si3D)) {
                 //alert('termina');
-                redirect_message('T2SB1Final', label);
+                redirect_message('T2pregunta2', label); //antes T2SB1Final
                 return;
             }
         }
@@ -505,183 +576,6 @@ function enviar_consulta() {
         return;
     }
 
-    if (msg.indexOf('documento') !== -1 && id_tipousuario == 2) {
-        $('#txtMessage').val('');
-        show_previews_dots();
-
-        append_msg(msg, 'person', 'text', '');
-
-        $('.dots_container_').parent().remove();
-        //append_msg('Selecciona tu tipo de documento', 'bot', 'text', '');
-        //return;
-
-        var generic = [
-            {
-                "title": "Seleccione su tipo de documento",
-                "options": [
-                    {
-                        "label": "DNI",
-                        "value": {
-                            "input": {
-                                "text": "DNI"
-                            }
-                        }
-                    },
-                    {
-                        "label": "CARNET DE EXTRANJERÍA",
-                        "value": {
-                            "input": {
-                                "text": "CARNET DE EXTRANJERÍA"
-                            }
-                        }
-                    }
-                ],
-                "response_type": "option"
-            }
-        ];
-
-        get_generic_elements(generic);
-        return;
-    }
-
-    if (msg.toUpperCase() == 'GRACIAS' || msg.toUpperCase() == 'MUCHAS GRACIAS') {
-        append_msg(msg, 'person', 'text', '');
-
-        $('#txtMessage').val('');
-        show_previews_dots();
-        $('.dots_container_').parent().remove();
-
-        var generic = [
-            {
-                "title": "¿Tienes alguna consulta adicional?",
-                "options": [
-                    {
-                        "label": "SI",
-                        "value": {
-                            "input": {
-                                "text": "si_otra_consulta"
-                            }
-                        }
-                    },
-                    {
-                        "label": "NINGUNA",
-                        "value": {
-                            "input": {
-                                "text": "ninguna_consulta"
-                            }
-                        }
-                    }
-                ],
-                "response_type": "option"
-            }
-        ];
-
-        get_generic_elements(generic);
-        return;
-    }
-
-    if ((msg == 'DNI' || msg == 'dni' || msg == 'CARNET DE EXTRANJERIA' || msg == 'carnet de extranjeria' || msg == 'CARNET DE EXTRANJERÍA' || msg == 'carnet de extranjería') && id_tipousuario == 2) {
-        $('#txtMessage').val('');
-        show_previews_dots();
-        append_msg(msg, 'person', 'text', '');
-        $('.dots_container_').parent().remove();
-
-        if (msg == tipo_documento) {
-            msg_previo = 'Tipo de documento correcto, ingrese el número de documento';
-            append_msg(msg_previo, 'bot', 'text', '');
-            $('#txtMessage').focus();
-        } else {
-            var generic = [
-                {
-                    "title": "El tipo de documento seleccionado es incorrecto.<br/>Seleccione su tipo de documento",
-                    "options": [
-                        {
-                            "label": "DNI",
-                            "value": {
-                                "input": {
-                                    "text": "DNI"
-                                }
-                            }
-                        },
-                        {
-                            "label": "CARNET EXTRANJERIA",
-                            "value": {
-                                "input": {
-                                    "text": "CARNET EXTRANJERIA"
-                                }
-                            }
-                        }
-                    ],
-                    "response_type": "option"
-                }
-            ];
-
-            get_generic_elements(generic);
-        }
-        return;
-    }
-
-    if (msg_previo == 'Tipo de documento correcto, ingrese el número de documento' || msg_previo == 'Número de documento incorrecto, vuelva a ingresarlo') {
-        $('#txtMessage').val('');
-        show_previews_dots();
-        append_msg(msg, 'person', 'text', '');
-        $('.dots_container_').parent().remove();
-
-        if (msg == num_documento) {
-            var generic = [
-                {
-                    "title": "Sus servicios asociados son:",
-                    "options": [
-                        //{
-                        //    "label": "PLAN HOGAR",
-                        //    "value": {
-                        //        "input": {
-                        //            "text": "PLAN HOGAR"
-                        //        }
-                        //    }
-                        //},
-                        //{
-                        //    "label": "POSTPAGO",
-                        //    "value": {
-                        //        "input": {
-                        //            "text": "POSTPAGO"
-                        //        }
-                        //    }
-                        //},
-                        {
-                            "label": "VER RECIBOS",
-                            "value": {
-                                "input": {
-                                    "text": "VER RECIBOS"
-                                }
-                            }
-                        }
-                    ],
-                    "response_type": "option"
-                }
-            ];
-            msg_previo = 'ver recibos';
-            get_generic_elements(generic);
-        } else {
-            append_msg('Número de documento incorrecto, vuelva a ingresarlo', 'bot', 'text', '');
-        }
-        return;
-    }
-
-    if (msg_previo == 'ver recibos') {
-        $('#txtMessage').val('');
-        show_previews_dots();
-        append_msg(msg, 'person', 'text', '');
-        $('.dots_container_').parent().remove();
-
-        if (msg == 'VER RECIBOS') {
-            append_msg('Cargando recibos...', 'bot', 'text', '');
-            msg_previo = '';
-            listar_recibos();
-        }
-        return;
-    }
-
     if (_label == 'ninguna_consulta') {
         append_msg('No tengo otra consulta', 'person', 'text', '');
         $('#txtMessage').val('');
@@ -703,6 +597,8 @@ function enviar_consulta() {
     }
 
     var mensaje_enviar = _label == '' ? msg : _label;
+
+    var validar;
 
     if (msg != '') {
         $.ajax({
@@ -735,6 +631,7 @@ function enviar_consulta() {
                     if (data.output.generic.length == 0) {
                         append_msg('Ingrese una opcion válida por favor', 'bot', 'text', '');
                     } else {
+                        validar = data.output.generic;
                         get_generic_elements(data.output.generic);
                     }
                 }
@@ -828,7 +725,16 @@ function text_type_obj(obj_text, type) {
     var listaRptas = [
         //terminó test 1
         'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo'
-        , 'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo\n\n'
+        ,'Muy bien se agendó un nuevo test, a partir de mañana podrá realizarlo\n\n'
+        ,'Muy bien se agendó un nuevo test de evaluación, a partir de mañana podrá realizarlo'
+        ,'Muy bien se agendó un nuevo test de evaluación, a partir de mañana podrá realizarlo\n\n'
+        ,'Gracias por participar en el cuestionario'
+        , 'Gracias por participar en el cuestionario\n\n'
+
+        , 'El test de evaluación ha concluido se generara una cita con su médico.'
+        , 'El test de evaluación ha concluido se generara una cita con su médico.\n\n'
+        , 'El test de evaluación ha concluido se generará una cita con su médico.'
+        , 'El test de evaluación ha concluido se generará una cita con su médico.\n\n'
     ];
 
     if (listaRptas.includes(text)) {
@@ -851,6 +757,13 @@ function text_type_obj(obj_text, type) {
                 } else {
                     append_msg(text, 'bot', type, '');
                 }
+            },
+            complete: function () {
+                setTimeout(function () {
+                    if (id_tipousuario == 2) {
+                        validar_flujo_existente();
+                    }
+                }, 5000);
             }
         });
     } else {
