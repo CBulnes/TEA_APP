@@ -858,7 +858,7 @@ function contenido_cita(dia, mes, año) {
                 }
                 if (item.tipo == 'CUESTIONARIO') {
                     html += '<div class="div_cita" style="background-color: #6fd530; text-align: center;" data-id-cita="' + item.id_cita + '" data-id-cuestionario="' + item.id_doctor_asignado + '" data-estado="' + item.estado + '" onclick="ver_cuestionario(this)">';
-                    html += 'Cuestionario #' + item.id_doctor_asignado + '<br/>';
+                    html += 'Nuevo cuestionario<br/>';// #' + item.id_doctor_asignado + '<br/>';
                     html += '</div > ';
                 }
             }

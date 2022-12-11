@@ -59,7 +59,7 @@ function ver_cuestionario(e) {
     var idCita = $(e).attr('data-id-cita');
     var estado = $(e).attr('data-estado');
 
-    if (cuestionario == 2) {
+    //if (cuestionario == 2) {
 
         if (estado == 'ATENDIDO') {
             alerta('El cuestionario seleccionado ya se ha aperturado', 'info');
@@ -107,7 +107,7 @@ function ver_cuestionario(e) {
             complete: function () {
             }
         });
-    }
+    //}
 }
 
 function cargar_datos_cita(id_cita, id_doctor, fecha, hora, estado) {
